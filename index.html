@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mon ciel — Laëtitia</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#3b3666">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mon ciel">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icon-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icon-152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="icon-120.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<style>
+:root{ color-scheme: light;
+  --bg:#f6f3ec; --panel:#fffdf8; --ink:#2b2740; --muted:#6f6985;
+  --gold:#b8893b; --indigo:#3b3666; --line:#e6dfd0; --accent:#7a6fb0;
+  --soft:#efe9dd; --harm:#3f7d6b; --tens:#b15c5c;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif;line-height:1.55}
+.wrap{max-width:800px;margin:0 auto;padding:22px 18px 70px}
+header.top{text-align:center;padding:18px 0 10px;border-bottom:1px solid var(--line)}
+.title{font-size:30px;letter-spacing:.5px;color:var(--indigo);margin:0}
+.subtitle{color:var(--muted);font-size:14px;margin-top:6px;font-style:italic}
+.moon{margin-top:12px;font-size:14px;color:var(--gold)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:18px 0}
+.tab{cursor:pointer;border:1px solid var(--line);background:var(--panel);
+  padding:7px 13px;border-radius:22px;font-size:13px;color:var(--muted);transition:.18s}
+.tab:hover{border-color:var(--gold)}
+.tab.active{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.panel{display:none;background:var(--panel);border:1px solid var(--line);
+  border-radius:14px;padding:22px;box-shadow:0 1px 0 #fff inset,0 6px 20px rgba(59,54,102,.06)}
+.panel.show{display:block;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+h2{font-size:21px;color:var(--indigo);margin:.1em 0 .1em}
+.eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin:0 0 2px}
+.date{color:var(--muted);font-size:13px;margin:0 0 16px}
+p{margin:.55em 0}
+.lead{font-size:16px}
+/* accordéons d'aspect */
+details.asp{margin:10px 0;background:var(--soft);border-radius:10px;border-left:3px solid var(--gold);overflow:hidden}
+details.asp>summary{cursor:pointer;padding:12px 15px;font-size:14.5px;color:var(--indigo);list-style:none;font-weight:600}
+details.asp>summary::-webkit-details-marker{display:none}
+details.asp>summary::before{content:"▸ ";color:var(--gold)}
+details.asp[open]>summary::before{content:"▾ "}
+details.asp .body{padding:2px 16px 14px;font-size:14px;border-top:1px solid var(--line)}
+details.asp.tens{border-left-color:var(--tens)} details.asp.tens>summary{color:#8c4444}
+details.asp.harm{border-left-color:var(--harm)} details.asp.harm>summary{color:#2f6b50}
+.ex{background:#f3efe6;border-radius:7px;padding:8px 11px;margin:8px 0;font-size:13.5px}
+.ex b{color:var(--gold)}
+.tip{margin:16px 0;padding:14px 16px;background:#f1efe6;border-radius:10px;border-left:3px solid var(--accent)}
+.tip h3{margin:0 0 6px;color:var(--accent);font-size:15px}
+.block{margin:14px 0;padding:13px 16px;background:var(--soft);border-radius:10px;border-left:3px solid var(--gold)}
+.block h3{margin:0 0 6px;font-size:15px;color:var(--indigo)}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:13.5px}
+th,td{text-align:left;padding:5px 8px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:normal;font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.glyph{font-size:16px;color:var(--indigo);width:24px}
+.retro{color:var(--tens);font-size:12px}
+.harm{color:var(--harm)} .tens{color:var(--tens)}
+.foot{text-align:center;color:var(--muted);font-size:12px;margin-top:26px;font-style:italic}
+.small{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;background:var(--indigo);color:#fff;border-radius:6px;padding:1px 8px;font-size:11.5px;margin-left:6px;vertical-align:middle}
+.tag.h{background:var(--harm)} .tag.t{background:var(--tens)}
+ul{margin:.4em 0;padding-left:1.2em} li{margin:.3em 0}
+.wheel{max-width:380px;margin:6px auto;display:block}
+.hint{font-size:12.5px;color:var(--muted);font-style:italic;margin:4px 0 14px}
+.daterow{display:flex;gap:10px;align-items:baseline;border-bottom:1px dotted var(--line);padding:7px 0}
+.daterow .d{min-width:74px;color:var(--gold);font-size:13px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1 class="title">✦ Mon ciel ✦</h1>
+  <div class="subtitle">L'espace astrologique de Laëtitia · née le 23 février 1981, 14h15, Aubagne</div>
+  <div class="moon">Soleil Poissons ♓ · Ascendant Cancer ♋ · Lune Balance ♎ · <em>période : double pivot de mi-vie (Uranus + Saturne)</em></div>
+  <div class="hint">💡 Clique sur chaque aspect (▸) pour déplier l'explication complète, son impact sur toi et la suite de ton parcours.</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-t="synthese">✦ Synthèse</div>
+  <div class="tab" data-t="jour">Jour</div>
+  <div class="tab" data-t="semaine">Semaine</div>
+  <div class="tab" data-t="mois">Mois</div>
+  <div class="tab" data-t="annee">Année</div>
+  <div class="tab" data-t="rs">Révolutions solaires</div>
+  <div class="tab" data-t="lunaisons">Lunaisons</div>
+  <div class="tab" data-t="domaines">Domaines</div>
+  <div class="tab" data-t="predictions">Prédictions</div>
+  <div class="tab" data-t="relations">Relations</div>
+  <div class="tab" data-t="naikarysma">Naïkarysma</div>
+  <div class="tab" data-t="profil">Mon profil</div>
+  <div class="tab" data-t="theme">Thème & cartes</div>
+  <div class="tab" data-t="portrait">Portrait</div>
+  <div class="tab" data-t="modeemploi">Mon mode d'emploi</div>
+  <div class="tab" data-t="destinee">Destinée & héritage</div>
+  <div class="tab" data-t="affinites">Affinités</div>
+  <div class="tab" data-t="questions">Mes questions</div>
+</div>
+
+<!-- ===================== SYNTHÈSE ===================== -->
+<section class="panel show" id="synthese">
+  <p class="eyebrow">Vue d'ensemble</p>
+  <h2>Ma synthèse du moment</h2>
+  <p class="date">Une lecture globale de là où tu en es — actualisée avec le ciel.</p>
+
+  <div class="card key" id="audiocard">
+    <h3 style="margin:0 0 6px">🎧 Ton message du jour <button id="playmsg" style="margin-left:8px;padding:6px 14px;border:none;border-radius:8px;background:var(--indigo);color:#fff;font-family:inherit;font-size:13px;cursor:pointer">▶ Écouter</button> <button id="stopmsg" style="padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--muted);font-family:inherit;font-size:12px;cursor:pointer;display:none">■ Stop</button></h3>
+    <p id="dailymsg" style="font-style:italic">Laëtitia, ce jeudi t'offre une parole claire et juste : ce que tu ressens trouve enfin ses mots, surtout le matin — alors écris, dis, ose ce que tu repousses. Tu as de l'élan disponible, mais il est fait pour avancer pas à pas, pas pour tout porter d'un coup. Si une pointe d'impatience monte en début d'après-midi, ne tranche rien à chaud : offre-la à ton corps, marche, respire. La Lune décroissante en Capricorne t'invite à relâcher ce qui pèse plutôt qu'à en rajouter. Reste attentive au petit signe, à la rencontre ou à l'idée qui te tire vers du neuf : c'est ta direction qui te fait signe. Tu n'as rien à prouver aujourd'hui — juste à rester fidèle à ton rythme, qui est le bon.</p>
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px">
+      <span class="small">Voix :</span>
+      <select id="voicesel" style="padding:5px 8px;border:1px solid var(--line);border-radius:8px;font-family:inherit;font-size:12.5px;background:var(--panel);color:var(--ink);max-width:240px"></select>
+      <span class="small" id="voicehint"></span>
+    </div>
+    <p class="small">Lu à voix haute par ton appareil (choisis ta voix préférée ci-dessus). Message réactualisé chaque jour.</p>
+  </div>
+
+  <div class="tip"><h3>✦ Le grand titre</h3><p>Tu es en plein <b>double pivot de mi-vie</b> (Uranus + Saturne) : une mue. Ton <b>année Cancer</b> (2026) te demande de reconstruire ton nid et de t'épanouir, avec <b>Jupiter sur ton Ascendant</b> qui te porte. La grande fenêtre d'élan pour Naïkarysma est <b>mi-août 2026</b>, et <b>2027 (année Lion)</b> sera ton année de rayonnement.</p></div>
+
+  <div class="block"><h3>Indice de climat astral du moment</h3>
+  <p class="small">Sur 10, selon les transits en cours (à lire comme une météo, pas une fatalité).</p>
+  <div id="scores"></div>
+  </div>
+
+  <details class="asp" open><summary>Les 5 choses à retenir maintenant</summary><div class="body"><ul>
+    <li><b>Te reconstruire un socle</b> (année Cancer) : foyer, énergie, douceur — priorité n°1.</li>
+    <li><b>Oser ta valeur</b> (Nœud maison 2) : c'est ton chemin d'évolution, et le cœur de Naïkarysma.</li>
+    <li><b>Fenêtre Naïkarysma</b> : pré-lancement ~15 juin, ouverture possible 30 juin, gros lancement mi-août.</li>
+    <li><b>Protéger ton énergie</b> : ton thème réclame du rythme, pas du sur-régime (anti-épuisement).</li>
+    <li><b>Couple & fils</b> : raviver avec Julien (oct-nov), dialoguer avec Nathan (année favorable).</li>
+  </ul></div></details>
+  <p class="small">Les scores reflètent le climat des transits actuels et évoluent dans le temps.</p>
+</section>
+
+<!-- ===================== JOUR ===================== -->
+<section class="panel" id="jour">
+  <p class="eyebrow">Rapport du jour</p>
+  <h2>Jeudi 4 juin 2026</h2>
+  <p class="date">🌖 Lune gibbeuse décroissante en Capricorne · phase de tri et de relâchement</p>
+
+  <details class="asp harm" open><summary>Mercure trigone ton Soleil natal — ta parole est juste (aspect dominant)</summary>
+  <div class="body"><p>Mercure (la pensée, la communication) coule en harmonie avec ton Soleil en Poissons, maison 9. C'est le meilleur aspect de la journée : ce que tu ressens trouve enfin ses mots, sans effort.</p>
+  <div class="ex"><b>Concrètement :</b> écris ce post / cet email que tu repousses ; passe l'appel important ; enregistre une vidéo. Avant midi surtout, ta clarté et ta justesse de ton sont au rendez-vous.</div>
+  <p><b>Impact sur toi :</b> tu te sens comprise, alignée entre ton cœur et ton expression. <b>Pour la suite :</b> ton année Cancer t'invite à parler depuis ton cœur et ton intimité — note ce qui sort aujourd'hui, ça pourra resservir.</p></div></details>
+
+  <details class="asp"><summary>Mars sextile ton Mars natal — de l'élan disponible</summary>
+  <div class="body"><p>Une réserve d'énergie d'action fluide et bien dosée. Tu peux avancer concrètement sur un chantier sans te brusquer.</p>
+  <div class="ex"><b>Concrètement :</b> attaque la tâche que tu remets depuis des jours — elle ira plus vite que prévu.</div>
+  <p><b>Pour la suite :</b> ces micro-passages te réapprennent à agir à ton rythme plutôt qu'en sur-régime — un apprentissage clé vu ta tendance à l'épuisement.</p></div></details>
+
+  <details class="asp tens"><summary>Soleil carré ton Mars natal — pointe d'impatience l'après-midi</summary>
+  <div class="body"><p>Friction possible entre ce que la journée demande et ton énergie : agacement, sensation qu'on te freine, envie de tout bousculer.</p>
+  <div class="ex"><b>Concrètement :</b> ne tranche pas une décision sous le coup de l'irritation après 14h. Mets l'énergie dans le corps (marche, sport, ménage actif) plutôt que dans une confrontation.</div>
+  <p><b>Impact / suite :</b> apprendre à reconnaître ce pic et à le canaliser, c'est désamorcer beaucoup de tensions relationnelles à répétition.</p></div></details>
+
+  <details class="asp"><summary>Nœud Nord transite ton Soleil — un signe vers ta direction</summary>
+  <div class="body"><p>Le Nœud Nord (le cap de l'âme) éclaire ton Soleil maison 9 (sens, transmission, horizon large).</p>
+  <div class="ex"><b>Concrètement :</b> reste attentive à une proposition, une rencontre, un « hasard » qui pointe vers ton chemin (enseigner, transmettre, élargir). Dis oui à ce qui t'agrandit.</div>
+  <p><b>Toile de fond :</b> ton opposition d'Uranus pousse au renouvellement — ce fil dure toute l'année.</p></div></details>
+
+  <details class="asp harm"><summary>Lune sextile ton Uranus natal — une ouverture légère (aspect très serré)</summary>
+  <div class="body"><p>La Lune du jour touche ton Uranus en harmonie : un petit courant d'air frais sur tes émotions, l'envie de sortir du cadre, une bonne surprise possible.</p>
+  <div class="ex"><b>Concrètement :</b> laisse une place à l'imprévu, à la spontanéité, à une idée neuve qui te traverse. Un message, une rencontre ou une bouffée d'inspiration peuvent égayer ta journée.</div>
+  <p><b>Impact sur toi :</b> ce micro-souffle de liberté apaise la tension Soleil–Mars de l'après-midi : c'est ta soupape du jour.</p></div></details>
+
+  <div class="tip"><h3>✦ Le concret du jour</h3><p>Matin = conversations & écriture (feu vert). Après-midi = ne réponds pas à chaud. Fil rouge = note ce qui t'attire vers du neuf.</p></div>
+  <p class="small">Régénéré automatiquement chaque soir à 21h pour le lendemain.</p>
+</section>
+
+<!-- ===================== SEMAINE ===================== -->
+<section class="panel" id="semaine">
+  <p class="eyebrow">Rapport de la semaine</p>
+  <h2>Du lundi 1<sup>er</sup> au dimanche 7 juin 2026</h2>
+  <p class="date">Semaine en deux temps : d'abord la fluidité, puis la pensée rencontre le réel</p>
+
+  <details class="asp harm" open><summary>Début de semaine — fluidité mentale (Mercure–Soleil)</summary>
+  <div class="body"><p>Le trigone Mercure–Soleil ouvre la semaine : idées claires, échanges faciles.</p>
+  <div class="ex"><b>Concrètement :</b> planifie tes contenus, tes rendez-vous importants et tes prises de parole en début de semaine.</div></div></details>
+
+  <details class="asp tens"><summary>Dim. 7 juin — Mercure carré ton Saturne & ton Jupiter natals</summary>
+  <div class="body"><p>Tes Saturne–Jupiter sont en Balance, maison 4 (foyer, racines, famille). Mercure les met au défi : une décision pèse, un doute s'invite, une responsabilité familiale/domestique demande à être tranchée.</p>
+  <div class="ex"><b>Concrètement :</b> mets par écrit ce qui te tracasse pour séparer le réel du catastrophisme ; reporte une réponse difficile de 24h. Évite de signer/trancher dans le découragement.</div>
+  <p><b>Impact / suite :</b> c'est un test de réalisme, pas un verdict. Ces passages t'entraînent à poser des limites saines (un thème de toute ta maison 4).</p></div></details>
+
+  <details class="asp tens"><summary>En fin de semaine — Vénus carré ton Pluton natal (intensité du cœur)</summary>
+  <div class="body"><p>Montée d'intensité dans les liens et/ou l'argent : attirance forte, désir de fusion, mais aussi possible jalousie, contrôle ou ressassement autour d'un proche.</p>
+  <div class="ex"><b>Concrètement :</b> dis ce que tu ressens plutôt que de le jouer en sourdine ; transforme l'intensité en conversation vraie. Côté argent : ne décide pas d'un gros engagement sur un coup d'émotion.</div></div></details>
+
+  <details class="asp harm"><summary>Éclaircie — Vénus en harmonie avec ton Uranus</summary>
+  <div class="body"><p>Bouffée d'air : surprise agréable, rencontre légère, envie de sortir du cadre.</p>
+  <div class="ex"><b>Concrètement :</b> laisse une place à l'imprévu et à la spontanéité — un imprévu joyeux est possible.</div></div></details>
+
+  <div class="tip"><h3>✦ Fil de la semaine</h3><p>Clarifier et assumer (mental, famille) → ressentir en profondeur → s'alléger. Sérieux en milieu de semaine, douceur ensuite.</p></div>
+</section>
+
+<!-- ===================== MOIS ===================== -->
+<section class="panel" id="mois">
+  <p class="eyebrow">Rapport du mois</p>
+  <h2>Juin → début juillet 2026</h2>
+  <p class="date">Grand thème : libération & renouvellement, fenêtre de chance fin juin</p>
+
+  <details class="asp harm" open><summary>22 juin — Vénus conjoint ton Nœud Nord (aligné avec ta destinée)</summary>
+  <div class="body"><p>Vénus passe sur ton Nœud Nord en Lion, maison 2 (ta valeur, ta créativité, ce que tu vaux).</p>
+  <div class="ex"><b>Concrètement :</b> moment idéal pour te faire reconnaître, valoriser ton travail, proposer une offre, ou affirmer ce qui te rend unique. Une rencontre ou opportunité peut « tomber juste ».</div>
+  <p><b>Suite :</b> c'est une répétition de la grande conjonction Jupiter–Nœud d'août (cf. onglet Naïkarysma).</p></div></details>
+
+  <details class="asp tens"><summary>28 juin — Mars oppose ton Uranus (pic de tension)</summary>
+  <div class="body"><p>Le point le plus électrique du mois : imprévu, envie d'agir vite, irritation contre toute contrainte.</p>
+  <div class="ex"><b>Concrètement :</b> évite les décisions brusques (rupture, gros achat, départ). Laisse passer 48h avant tout acte irréversible. Bon jour pour bouger physiquement, mauvais pour négocier.</div></div></details>
+
+  <details class="asp harm"><summary>30 juin — Jupiter trigone ton Uranus (la plus belle fenêtre)</summary>
+  <div class="body"><p>Ouverture, opportunité inattendue, innovation qui paie, liberté qui s'élargit.</p>
+  <div class="ex"><b>Concrètement :</b> si tu as un projet à lancer ou un risque positif à prendre, c'est le bon jour. Couplé à Mars deux jours avant : <em>libère d'abord, puis ose</em>.</div></div></details>
+
+  <div class="tip"><h3>✦ Trajectoire</h3><p>Quinzaine plus intérieure → 22 juin porteur (te valoriser) → fin juin libération + chance → début juillet intensité du cœur.</p></div>
+</section>
+
+<!-- ===================== ANNÉE ===================== -->
+<section class="panel" id="annee">
+  <p class="eyebrow">L'année en cours</p>
+  <h2>23 fév. 2026 → 22 fév. 2027</h2>
+  <p class="date">Ascendant de l'année : Cancer ♋ (révolution solaire à Istanbul) — foyer, base émotionnelle & épanouissement de soi</p>
+
+  <details class="asp" open><summary>Ascendant Cancer — l'année du nid et de soi</summary>
+  <div class="body"><p>Avec un Ascendant Cancer, ton année est tournée vers ton <b>foyer, ta sécurité émotionnelle, le soin de toi et des tiens, tes racines</b>. Après des années d'épuisement, c'est une année pour te reconstruire une base douce et protectrice.</p>
+  <div class="ex"><b>Concrètement :</b> aménage ton nid, protège ton intérieur (au sens propre et figuré), entoure-toi, ralentis. Ce n'est pas du repli : c'est te redonner un socle.</div></div></details>
+
+  <details class="asp" open><summary>Jupiter sur ton Ascendant — tu grandis et tu t'épanouis</summary>
+  <div class="body"><p>Jupiter de l'année est en Cancer, <b>conjoint à l'Ascendant (maison 1)</b> : c'est l'un des meilleurs placements possibles — une année d'expansion personnelle, de confiance, de bienveillance envers toi, d'ouverture. Tu prends de la place, en douceur.</p>
+  <div class="ex"><b>Concrètement :</b> ose dire oui à ce qui t'agrandit ; les portes s'ouvrent quand tu pars de ton authenticité plutôt que de l'effort.</div></div></details>
+
+  <details class="asp"><summary>Vocation très présente — Soleil, Mars, Vénus, Mercure en maisons 9 & 10</summary>
+  <div class="body"><p>Ton Soleil (M9), Vénus (M9), Mars (M9) et Mercure (M10, près du MC Poissons) : ta <b>vocation et ta visibilité</b> sont activées. Tu transmets, tu te montres, tu donnes du sens.</p>
+  <div class="ex"><b>Concrètement :</b> année pour faire connaître ton travail (Naïkarysma) tout en prenant soin de ton équilibre intérieur.</div></div></details>
+
+  <details class="asp"><summary>Maison 8 activée — transformation profonde</summary>
+  <div class="body"><p>Mars de l'année conjoint ton Mercure–Vénus natals (maison 8) : métamorphose intérieure, intimité, régénération, et possibles mouvements financiers. En toile de fond, Uranus oppose ton Uranus (le pivot de mi-vie).</p></div></details>
+
+  <div class="tip"><h3>✦ Phrase de l'année</h3><p><em>« Reconstruire mon nid et m'épanouir (Cancer + Jupiter), pendant qu'une transformation profonde me traverse. »</em></p></div>
+</section>
+
+<!-- ===================== RÉVOLUTIONS SOLAIRES ===================== -->
+<section class="panel" id="rs">
+  <p class="eyebrow">Révolutions solaires</p>
+  <h2>Ton année astrologique, année après année</h2>
+  <p class="hint">La révolution solaire est le ciel de l'instant exact (vérifié à la minute) où le Soleil revient à sa position de naissance. <b>L'Ascendant dépend du lieu où tu te trouves</b> ce jour-là — c'est pourquoi il change d'une ville à l'autre.</p>
+
+  <details class="asp" open><summary>RS 2026 — Ascendant Cancer ♋ (calculée à Istanbul, où tu étais)</summary>
+  <div class="body"><p><b>Instant :</b> 23 févr. 2026, 11h09 TU · <b>Asc 10°02′ Cancer · MC 18°14′ Poissons.</b></p>
+  <p><b>Thème :</b> année du foyer, de la sécurité émotionnelle et de l'épanouissement de soi. <b>Jupiter 15°29′ Cancer en maison 1</b> (sur l'Ascendant) : expansion personnelle, confiance, bienveillance. Vocation très active (Soleil & Vénus M9, Mercure M10, MC Poissons). Mars en M9 conjoint ton Mercure-Vénus natals (transformation profonde de ta manière d'accompagner). Uranus oppose ton Uranus (pivot de mi-vie).</p>
+  <p class="small">Soleil 4°50′ Poissons (M9) · Lune 20°56′ Taureau (M11) · Mercure 21°54′ Poissons (M10) · Vénus 16°18′ Poissons (M9) · Mars 24°22′ Verseau (M9) · Jupiter 15°29′ Cancer R (M1) · Saturne 1°04′ Bélier (M10) · Uranus 27°37′ Taureau (M11) · Pluton 4°22′ Verseau (M8).</p>
+  <div class="ex"><b>À retenir :</b> reconstruis ton socle et épanouis-toi ; ta vocation gagne du terrain en coulisses.</div></div></details>
+
+  <details class="asp"><summary>RS 2027 — Ascendant Lion ♌ (calculée chez toi, près de Toulouse)</summary>
+  <div class="body"><p><b>Instant :</b> 23 févr. 2027, 16h54 TU · <b>Asc 27°56′ Lion · MC 20°49′ Taureau.</b></p>
+  <p><b>Thème :</b> après le nid de 2026, c'est <b>l'année où tu rayonnes</b>. Ascendant Lion = visibilité, créativité, courage, leadership. <b>Mars (M1) et Jupiter (M12→1) en Lion</b> : énergie, confiance et <b>expansion de ta présence</b> — tu sors de l'ombre. Soleil en maison 7 (public, clients, partenariats) et Lune en maison 2 (revenus, valeur) : <b>une année en or pour faire grandir Naïkarysma et tes revenus</b>.</p>
+  <p class="small">Soleil 4°50′ Poissons (M7) · Lune 11°09′ Balance (M2) · Mercure 24°28′ Verseau R (M6) · Vénus 23°24′ Capricorne (M5) · Mars 29°09′ Lion R (M1) · Jupiter 20°23′ Lion R (M12) · Saturne 12°29′ Bélier (M8) · Uranus 1°47′ Gémeaux (M10) · Pluton 6°00′ Verseau (M6).</p>
+  <div class="ex"><b>À retenir :</b> ose te montrer, prends la lumière, développe ta clientèle et ta visibilité — l'année se prête au rayonnement et à la croissance.</div></div></details>
+  <p class="small">Calculs vérifiés au degré près sur AstroThème · lieu par défaut : ta résidence ; 2026 calculée à Istanbul. Mis à jour chaque 23 février.</p>
+</section>
+
+<!-- ===================== LUNAISONS ===================== -->
+<section class="panel" id="lunaisons">
+  <p class="eyebrow">Nouvelles & pleines lunes</p>
+  <h2>Tes lunaisons à venir</h2>
+  <p class="hint">Nouvelle lune 🌑 = on sème une intention ; pleine lune 🌕 = ça se révèle ou aboutit. Chaque lunaison éclaire une maison de ton thème. Liste sur 12 mois, réactualisée automatiquement.</p>
+
+  <div class="card key"><h3 style="margin:0 0 6px">✦ Aperçu général — ce que t'apportent ces lunaisons</h3>
+  <p>Sur l'année qui vient, tes lunaisons te ramènent sans cesse à quelques grands chantiers. Celles de <b>fin mai</b> (encore actives) ont lancé un <b>élan créatif et de projets</b> (maisons 5 et 11), aligné avec ta voie (pleine lune du 31 mai en harmonie avec ton Nœud) : il continue de se déployer sur plusieurs mois. Les prochaines t'orientent surtout vers ton <b>corps et ton rythme</b> (maison 6, qui revient souvent), tes <b>fondations / ton foyer</b> (maison 4), ta <b>valeur</b> (maison 2) et ta <b>visibilité</b> (maisons 1 et 10).</p>
+  <p style="margin-top:8px"><b>Ce que ça amène, domaine par domaine :</b></p>
+  <ul>
+    <li><b>✶ Pro & vocation :</b> les pleines lunes en maison 10 (26 sept., 26 oct.) et les lunaisons en maison 9 (28 août, 8 mars) éclairent et font aboutir ton travail — montre ce que tu fais, gagne en visibilité.</li>
+    <li><b>◈ Argent & valeur :</b> la nouvelle lune du <b>12 août sur ton Nœud (maison 2)</b> sème ta nouvelle source de revenus ; la pleine lune Taureau du 26 oct. l'ancre dans le concret.</li>
+    <li><b>❤ Couple & relations :</b> la pleine lune du 29 juil. (maison 7) invite à la maturité dans un lien ; côté amitiés/réseaux, du mouvement (maison 11) depuis mi-mai.</li>
+    <li><b>✲ Création :</b> l'élan de fin mai se poursuit ; la nouvelle lune du 9 nov. (maison 5) relance ta créativité la plus intime.</li>
+    <li><b>🏡 Foyer & famille :</b> nouvelle lune du 10 oct. et pleine lune du 22 mars (maison 4) — réaménage et apaise ton nid.</li>
+    <li><b>🩺 Santé & quotidien :</b> <b>thème récurrent</b> (pleines/nouvelles lunes des 30 juin, 9 déc., 7 janv. en maison 6) : le ciel insiste pour que tu allèges ta charge et bâtisses des routines durables.</li>
+    <li><b>🌊 Intérieur & repos :</b> nouvelles/pleines lunes des 15 juin et 24 déc. (maison 12) — introspection, recueillement, soin invisible.</li>
+  </ul>
+  <p style="margin-top:8px"><b>🎓 La leçon à retenir :</b> le fil de ton année lunaire est limpide — <em>« prends soin de ta base (corps, foyer, valeur) et, de là, ose te montrer. »</em> Ta visibilité et tes revenus grandiront d'autant mieux qu'ils reposeront sur un socle solide, jamais sur le sur-épuisement.</p>
+  <p><b>Comment l'appliquer concrètement au quotidien :</b> instaure une routine douce et régulière (le ciel te le répète via la maison 6) ; à chaque <b>nouvelle lune</b>, pose une intention écrite ; à chaque <b>pleine lune</b>, fais le point et relâche ce qui pèse ; réserve tes <b>lancements</b> (offres, contenus) autour des nouvelles lunes en maisons 2, 9 et 10 — surtout le <b>12 août</b>.</p>
+  <p><b>Ce que tu vas en apprendre, et ce qui va évoluer :</b> tu vas apprendre, dans ton corps, que <b>te ménager n'est pas un frein mais le moteur</b> de ta réussite durable. Concrètement, sur l'année : un rythme de vie plus tenable, un foyer réaménagé et apaisé, une offre et une valeur enfin posées (Naïkarysma), et une présence plus assumée et plus visible.</p>
+  </div>
+
+  <p class="eyebrow" style="margin-top:14px">Récemment — encore actives</p>
+  <details class="asp tens"><summary>🌕 1 mai — Scorpion, maison 5 · carré ton Nœud</summary><div class="body"><p>Une pleine lune créative et passionnée qui a pu créer une tension entre ce que tu désires créer et ta direction de vie.</p><div class="ex"><b>Encore actif :</b> ce qui a émergé là (un désir créatif, une vérité) demande à trouver sa place dans ton cap.</div></div></details>
+  <details class="asp tens"><summary>🌑 16 mai — Taureau, maison 11 · carré ta Vénus</summary><div class="body"><p>Nouvelle lune sur tes projets, amitiés et réseaux, avec une note relationnelle à ajuster.</p><div class="ex"><b>Encore actif :</b> un cercle ou un projet collectif se redessine — laisse-le mûrir.</div></div></details>
+  <details class="asp harm"><summary>🌕 31 mai — Sagittaire, maison 5 · trigone ton Nœud</summary><div class="body"><p>Toute fraîche : une pleine lune d'expression et de joie, <b>en harmonie avec ta voie</b>. Elle peut avoir lancé un élan créatif porteur.</p><div class="ex"><b>Encore actif :</b> suis ce qui t'a inspirée fin mai — c'est aligné, ça se déploie sur les mois à venir.</div></div></details>
+
+  <p class="eyebrow" style="margin-top:6px">Été 2026</p>
+  <details class="asp harm"><summary>🌑 15 juin — 24° Gémeaux, maison 12 · trigone ton Pluton</summary><div class="body"><p>Renouveau intérieur en douceur, dans le secret et le retrait.</p><div class="ex"><b>Sème :</b> repos, introspection, lâcher-prise — et prépare en coulisses un projet (pré-liste Naïkarysma).</div></div></details>
+  <details class="asp tens"><summary>🌕 30 juin — 8° Capricorne, maison 6 · carré ton Saturne</summary><div class="body"><p>Ce qui est trop lourd dans ton quotidien, ton travail, ton corps se révèle.</p><div class="ex"><b>Récolte/ajuste :</b> allège ta charge, restructure une routine. Bon thème de communication : « calmer le mental au quotidien ».</div></div></details>
+  <details class="asp tens"><summary>🌑 14 juillet — 22° Cancer, maison 1 · carré ton Pluton</summary><div class="body"><p>Sur ton Ascendant : un appel à muer, sur ton identité et ton image.</p><div class="ex"><b>Sème :</b> un nouveau départ personnel (posture, image, positionnement). Intense mais transformateur.</div></div></details>
+  <details class="asp harm"><summary>🌕 29 juillet — 6° Verseau, maison 7 · trigone ton Saturne</summary><div class="body"><p>Lumière sur les relations et l'équilibre donner/recevoir.</p><div class="ex"><b>Récolte :</b> maturité possible dans un lien ; clarifie un partenariat ou une collaboration.</div></div></details>
+  <details class="asp harm"><summary>🌑 12 août — 20° Lion, maison 2 (ton Nœud Nord)</summary><div class="body"><p>Sur ton Nœud Nord : intention forte autour de ta valeur, ta créativité, ton argent.</p><div class="ex"><b>Sème (fenêtre en or) :</b> ouvre / lance une offre alignée avec qui tu es. La meilleure lunaison de l'année pour Naïkarysma.</div></div></details>
+  <details class="asp harm"><summary>🌕 28 août — 6° Poissons, maison 9 · conjonction ton Soleil</summary><div class="body"><p>Ta pleine lune la plus personnelle : elle illumine ton Soleil.</p><div class="ex"><b>Récolte :</b> clarté sur ton chemin de sens ; incarne ta vision (« Nouvelle Ère »).</div></div></details>
+
+  <p class="eyebrow" style="margin-top:6px">Automne 2026</p>
+  <details class="asp"><summary>🌑 11 septembre — Vierge, maison 3</summary><div class="body"><p>Nouveau cycle autour du mental, de l'écrit, de la communication et de l'organisation.</p><div class="ex"><b>Sème :</b> un projet d'écriture/contenu, une nouvelle organisation du quotidien.</div></div></details>
+  <details class="asp"><summary>🌕 26 septembre — Bélier, maison 10</summary><div class="body"><p>Lumière sur ta vie publique / ta vocation : un aboutissement professionnel se voit.</p><div class="ex"><b>Récolte :</b> montre un résultat, assume une visibilité.</div></div></details>
+  <details class="asp"><summary>🌑 10 octobre — Balance, maison 4</summary><div class="body"><p>Nouveau cycle dans le foyer, la famille, l'harmonie intérieure (sur ton amas natal).</p><div class="ex"><b>Sème :</b> une intention pour ton « chez-toi » et tes liens proches.</div></div></details>
+  <details class="asp harm"><summary>🌕 26 octobre — Taureau, maison 10 · sextile ton Soleil</summary><div class="body"><p>Aboutissement concret et stable côté carrière/vocation.</p><div class="ex"><b>Récolte :</b> bonne période pour ancrer/officialiser ; couplée à la fenêtre Jupiter-Vénus (ventes).</div></div></details>
+  <details class="asp"><summary>🌑 9 novembre — Scorpion, maison 5</summary><div class="body"><p>Nouveau cycle créatif, intime et passionné (sur ta maison 5, Lilith).</p><div class="ex"><b>Sème :</b> un projet créatif qui te ressemble vraiment ; ose ton désir.</div></div></details>
+  <details class="asp tens"><summary>🌕 24 novembre — Gémeaux, maison 11 · opposition ton Uranus</summary><div class="body"><p>Lumière (parfois surprise) sur tes amitiés, réseaux, projets collectifs — besoin de liberté activé.</p><div class="ex"><b>Récolte :</b> un changement de cercle ou de cap collectif peut se révéler. Reste souple.</div></div></details>
+
+  <p class="eyebrow" style="margin-top:6px">Hiver 2026-2027</p>
+  <details class="asp"><summary>🌑 9 décembre — Sagittaire, maison 6</summary><div class="body"><p>Nouveau cycle autour du quotidien, du travail et de la santé, avec un souffle d'horizon.</p><div class="ex"><b>Sème :</b> une routine plus inspirante, un soin du corps qui a du sens.</div></div></details>
+  <details class="asp harm"><summary>🌕 24 décembre — Cancer, maison 12 · trigone ton Soleil</summary><div class="body"><p>Pleine lune douce et intérieure, en fin d'année : bilan tendre et apaisé.</p><div class="ex"><b>Récolte :</b> repos, gratitude, recueillement — laisse remonter ce qui veut être vu.</div></div></details>
+  <details class="asp"><summary>🌑 7 janvier 2027 — Capricorne, maison 6</summary><div class="body"><p>Nouveau cycle de structuration du quotidien et du travail (parfait pour l'année Vierge à venir).</p><div class="ex"><b>Sème :</b> une organisation solide, des habitudes durables.</div></div></details>
+  <details class="asp"><summary>🌕 22 janvier 2027 — Lion, maison 1</summary><div class="body"><p>Lumière sur toi, ton identité, ton rayonnement (annonce ton année Lion).</p><div class="ex"><b>Récolte :</b> ose te montrer ; un élan personnel se révèle.</div></div></details>
+  <details class="asp"><summary>🌑 6 février 2027 — Verseau, maison 8</summary><div class="body"><p>Nouveau cycle de transformation profonde, intimité, ressources partagées.</p><div class="ex"><b>Sème :</b> un renouvellement intérieur ou financier en profondeur.</div></div></details>
+  <details class="asp tens"><summary>🌕 21 février 2027 — Vierge, maison 3 · opposition ton Soleil</summary><div class="body"><p>Juste avant ton anniversaire : tension lumineuse entre ton besoin de sens (Poissons) et le concret du quotidien (Vierge).</p><div class="ex"><b>Récolte :</b> ce qui demande à être trié, simplifié, mis en ordre avant ta nouvelle année.</div></div></details>
+
+  <p class="eyebrow" style="margin-top:6px">Printemps 2027</p>
+  <details class="asp"><summary>🌑 8 mars — Poissons, maison 9 · près de ton Soleil</summary><div class="body"><p>Très belle nouvelle lune pour toi : nouveau cycle de sens, de vision, de foi.</p><div class="ex"><b>Sème :</b> un grand projet porteur de sens, une intention d'année.</div></div></details>
+  <details class="asp harm"><summary>🌕 22 mars — Balance, maison 4 · sextile ton Uranus</summary><div class="body"><p>Lumière sur le foyer avec un souffle de nouveauté/liberté.</p><div class="ex"><b>Récolte :</b> un réaménagement heureux de ton « chez-toi ».</div></div></details>
+  <details class="asp"><summary>🌑 7 avril · 6 mai · 4 juin — Bélier (M10), Taureau (M11), Gémeaux (M11)</summary><div class="body"><p>Cycle de printemps tourné vers la vocation publique (M10) puis les projets et amitiés (M11). Le 6 mai (Taureau, sextile ton Mars) soutient l'action concrète ; le 4 juin (Gémeaux, carré ton Mars) demande de doser ton énergie.</p></div></details>
+</section>
+
+<!-- ===================== DOMAINES ===================== -->
+<section class="panel" id="domaines">
+  <p class="eyebrow">Mes domaines de vie</p>
+  <h2>Chaque sphère, lue par ton ciel</h2>
+
+  <p class="hint">Dans l'ordre qui compte pour toi : le pro, l'argent, le couple, puis le reste, et la santé pour finir.</p>
+
+  <details class="asp" open><summary>✶ Vocation, travail & projet (pro)</summary><div class="body"><p>MC Poissons, Soleil + Mars maison 9, Mercure-Vénus maison 8 : ta vocation est d'<b>accompagner, transmettre et transformer l'intime</b> — exactement ton métier et le cœur de Naïkarysma. La maison 9 te pousse à élargir (enseigner, créer des programmes, porter un message) ; la maison 8 te rend puissante sur les sujets profonds (ruminations, dépendance affective, schémas).</p>
+  <div class="ex"><b>Concrètement :</b> le Nœud maison 2 te demande de <b>valoriser et tarifer justement</b> ton don. Cesse de sous-estimer ce que tu apportes.</div>
+  <p><b>Période :</b> Jupiter sur ton Nœud en août 2026 (lancer/visibiliser) ; 2027 (année Lion) = ton année de rayonnement et de croissance pro.</p></div></details>
+
+  <details class="asp" open><summary>◈ Argent & valeur</summary><div class="body"><p>Nœud Nord en maison 2 (Lion) + Chiron en maison 11 (Taureau) : ta relation à l'argent et à ta propre valeur est <b>le grand apprentissage de ta vie</b>. Une part de toi a pu croire qu'elle « valait » par ce qu'elle donne aux autres ; ton évolution est d'oser recevoir et rayonner.</p>
+  <div class="ex"><b>Concrètement :</b> demander, recevoir, te faire payer à ta juste valeur — c'est littéralement ton chemin d'évolution, pas de l'égoïsme. Un revenu juste te permet de continuer à aider.</div>
+  <p><b>Période :</b> 2027 (Jupiter en Lion, Lune RS maison 2) très porteur pour tes revenus ; fenêtres Vénus/Jupiter en oct-nov 2026 pour les ventes.</p></div></details>
+
+  <details class="asp" open><summary>❤ Couple</summary><div class="body"><p>Descendant Capricorne (maître Saturne en maison 4) : tu cherches un lien <b>solide, fondateur, durable</b>, lié au foyer que vous bâtissez. Vénus trigone Pluton : tu aimes intensément, en profondeur, tout ou rien.</p>
+  <div class="ex"><b>Concrètement :</b> en ce moment l'opposition de Saturne demande de rééquilibrer les charges et de redire le « pourquoi » de l'engagement ; la fenêtre Jupiter sur ta Vénus (oct-nov 2026) est idéale pour raviver tendresse et désir. (Voir l'onglet Relations pour Julien.)</p></div></details>
+
+  <details class="asp"><summary>💞 Vie relationnelle & amitiés</summary><div class="body"><p>Ascendant Cancer + Lune maison 4 : tu tisses des liens profonds, protecteurs, durables ; le « clan » compte énormément. Vénus–Pluton : en amitié comme en amour, c'est intense et loyal.</p>
+  <div class="ex"><b>Concrètement :</b> attention à trop porter les autres (Cérès maison 12) au point de t'oublier. Apprends à recevoir, à demander, et à laisser de l'espace sans culpabiliser.</div></div></details>
+
+  <details class="asp"><summary>✲ Création</summary><div class="body"><p>Maison 5 chargée (Uranus, Lilith, Junon, Cupidon) : une créativité <b>intense, originale, presque volcanique</b>, qui déteste le formatage. Lilith en maison 5 : ta puissance créatrice est ta part la plus libre.</p>
+  <div class="ex"><b>Concrètement :</b> crée pour toi d'abord, sans permission ni cadre imposé. C'est en créant librement que tu trouves tes meilleures idées (y compris pour Naïkarysma).</div></div></details>
+
+  <details class="asp"><summary>✈ Liberté & voyage</summary><div class="body"><p>Soleil + Mars en maison 9 : l'ailleurs, l'étranger, les grandes idées te nourrissent vitalement. L'opposition d'Uranus en cours rend ton <b>besoin d'espace structurel</b> cette année.</p>
+  <div class="ex"><b>Concrètement :</b> honore ce besoin (voyages, changements de cadre, autonomie de temps et de lieu) — c'est exactement la liberté que vise ton projet, et ce n'est pas un caprice.</div></div></details>
+
+  <details class="asp"><summary>🏡 Famille & foyer</summary><div class="body"><p>Amas Jupiter–Saturne–Pluton + Lune en maison 4 : le foyer est ton <b>grand œuvre et ton lieu de transformation</b>. Beaucoup de profondeur, parfois un poids hérité, mais une immense capacité à régénérer les liens et à fonder un vrai « chez-soi ».</p>
+  <div class="ex"><b>Concrètement :</b> 2026 (année Cancer) et 2027-2028 (Pluton/Uranus sur ta maison 4) sont le moment de rebâtir des fondations qui te ressemblent vraiment.</div></div></details>
+
+  <details class="asp"><summary>🌊 État émotionnel</summary><div class="body"><p>Lune Balance maison 4 + dominante d'eau + Lune conjoint Pluton : grande émotive-intuitive, émotions intenses qui te régénèrent quand tu les traverses au lieu de les contenir.</p>
+  <div class="ex"><b>Concrètement :</b> nomme ce que tu ressens (journal, parole). Ton baromètre intérieur est fiable : si quelque chose « ne passe pas », c'est une donnée, pas un caprice.</div></div></details>
+
+  <details class="asp"><summary>✧ Spiritualité & sens</summary><div class="body"><p>Soleil Poissons + Neptune maison 6 + Part de Fortune maison 9 : ton équilibre passe par une vie intérieure, une pratique, du sens. Tu es une intuitive ; honore tes ressentis comme des données.</p></div></details>
+
+  <details class="asp"><summary>🩺 Santé & énergie</summary><div class="body"><p>Neptune en maison 6 + Mars Poissons : énergie <b>cyclique et perméable au stress</b> — tu absorbes, et tu te vides vite si tu te forces. Ton épuisement passé est un signal de ton thème, pas une faiblesse.</p>
+  <div class="ex"><b>Concrètement :</b> protège ton énergie comme une ressource limitée — rythme doux mais régulier, sommeil, temps seule, pratiques corps-esprit (marche, respiration, eau). Alterne effort et récupération ; c'est la condition de ta réussite durable.</div>
+  <p><b>Période :</b> la pleine lune du 30 juin (maison 6) t'invite à alléger ta charge ; vigilance sur le rythme en 2030 (Saturne sur ton Soleil).</p></div></details>
+</section>
+
+<!-- ===================== PRÉDICTIONS ===================== -->
+<section class="panel" id="predictions">
+  <p class="eyebrow">Prédictions</p>
+  <h2>Du court au très très long terme</h2>
+
+  <p class="hint">Les transits lents (Jupiter, Saturne, Uranus, Neptune, Pluton, Nœud) datés sur ton thème, du plus proche au plus lointain. Réactualisé automatiquement.</p>
+
+  <details class="asp" open><summary>Court terme · 2026 — décider et lancer</summary><div class="body">
+  <div class="daterow"><span class="d">18 juil.</span><span><span class="tens">Uranus carré ton Soleil</span> : secousse de liberté, envie de tout changer — fais-en un choix conscient, pas une fuite.</span></div>
+  <div class="daterow"><span class="d">17 août</span><span><span class="harm">Jupiter conjoint ton Nœud Nord</span> : la grande porte de l'année, alignée avec ta destinée (visibilité, valeur). À saisir.</span></div>
+  <div class="daterow"><span class="d">16–31 oct.</span><span><span class="harm">Jupiter sur ta Vénus & ton Mercure</span> : reconnaissance, mots justes, liens chaleureux, ventes — excellente période de communication.</span></div>
+  <div class="daterow"><span class="d">5 nov.</span><span><span class="tens">Saturne opposition ton Saturne</span> : le pic du bilan de mi-vie — on tranche ce qui ne tient plus.</span></div>
+  <div class="daterow"><span class="d">nov.–déc.</span><span><span class="harm">Nœud sur ta Vénus puis ton Mercure</span> : rencontres et idées alignées avec ton chemin.</span></div>
+  <div class="ex"><b>En un mot :</b> 2026 = décisions de fond + lancement de ce qui te ressemble, sur fond de libération.</div></div></details>
+
+  <details class="asp"><summary>Moyen terme · 2027–2028 — reconstruire du solide</summary><div class="body">
+  <p><b>2027 (année Lion, rayonnement) :</b> <span class="harm">Uranus trigone ton Saturne et ton Jupiter (été)</span> apporte de l'air neuf et des opportunités de structure ; <span class="harm">Jupiter opposition ton Soleil (17 août)</span> = expansion, mais ne te disperse pas.</p>
+  <p><b>2028 :</b> <span class="harm">Pluton trigone ton Saturne puis ton Jupiter (mars-avril)</span> : tu reconstruis tes fondations (maison 4 : foyer, base de vie, modèle d'activité) <b>en profondeur et durablement</b>. En parallèle, <span class="tens">Neptune opposition ton Saturne-Jupiter (mai-juin)</span> peut brouiller les repères : garde du concret.</p>
+  <div class="ex"><b>En un mot :</b> phase pour bâtir ce qui dure (revenus récurrents, foyer, structure) — les efforts s'ancrent pour des années.</div></div></details>
+
+  <details class="asp"><summary>Long terme · 2029–2032 — liberté ET responsabilité</summary><div class="body">
+  <div class="daterow"><span class="d">2030</span><span><span class="tens">Saturne opposition ton Uranus</span> puis carré ton Soleil : l'art de rester libre tout en tenant tes engagements ; vigilance sur le rythme (anti-épuisement).</span></div>
+  <div class="daterow"><span class="d">2032</span><span><span class="harm">Saturne trigone ton Soleil</span> et opposition Neptune : autorité tranquille, projets qui prennent une forme solide et reconnue.</span></div>
+  <div class="ex"><b>En un mot :</b> tu deviens la bâtisseuse posée de ce que tu as semé.</div></div></details>
+
+  <details class="asp"><summary>Très long terme · 2033–2037 — la récolte</summary><div class="body"><p><span class="harm">Uranus trigone ton Soleil puis ta Lune (2033-2035)</span> : une seconde jeunesse intérieure, plus libre et plus alignée que jamais — le fruit direct du grand chantier commencé en 2026. Tu récoltes une vie qui te ressemble, avec une liberté (de temps, de lieu, d'argent) enfin installée.</p></div></details>
+
+  <details class="asp"><summary>Très très long terme · ~2038–2041 — la transmission</summary><div class="body"><p>Ton <b>second retour de Saturne (~2040, vers 59 ans)</b> : la grande maturité. Tu deviens pleinement l'autorité de ta propre vie et, souvent, une <b>transmettrice / guide</b> pour d'autres. Tout ce que tu auras restructuré en 2026-2032 trouve là sa forme accomplie — c'est l'âge d'or de ta vocation (maison 9).</p></div></details>
+
+  <div class="tip"><h3>✦ Le fil : passé → présent → futur</h3><p>Tu as beaucoup porté (Saturne–Pluton maison 4 : héritage, foyer). Tu te libères maintenant de ce qui est devenu trop étroit (Uranus). Tu apprends que ta valeur ne dépend pas de ce que tu portes pour les autres (Nœud maison 2). Tu vas reconstruire une vie qui te ressemble (2027-2032), la savourer (2033+), puis la transmettre (~2040). Ton thème raconte une libération qui devient transmission.</p></div>
+</section>
+
+<!-- ===================== RELATIONS ===================== -->
+<section class="panel" id="relations">
+  <p class="eyebrow">Mes relations</p>
+  <h2>Julien & Nathan</h2>
+
+  <h3 style="color:var(--indigo)">💞 Julien <span class="small">(11 déc. 1981, 1h40, Nice · Soleil Sagittaire, Asc Balance, Lune Gémeaux)</span></h3>
+  <div class="block"><p>Un lien d'âme, profond et fondateur (ensemble depuis 1999).</p></div>
+  <details class="asp" open><summary>Vos liens de fond (synastrie)</summary><div class="body"><ul>
+    <li><b>Ta Lune conjointe à son Pluton</b> (0,5°) : attachement émotionnel intense et transformateur — vous vous touchez en profondeur.</li>
+    <li><b>Son Saturne–Pluton en Balance sur ton amas de maison 4</b> : lien karmique tissé autour du foyer, de la durée, des fondations bâties ensemble.</li>
+    <li><span class="harm">Ton Soleil trigone son Jupiter</span> : il soutient ta croissance, ouvre ton optimisme.</li>
+    <li><span class="tens">Ton Mars carré sa Lune</span> : la friction du couple — rythmes et besoins émotionnels à réaccorder, surtout en période de fatigue.</li>
+  </ul></div></details>
+  <details class="asp"><summary>Ce que ça donne — jour · semaine · mois · année · suite</summary><div class="body">
+    <p><b>Jour :</b> avec ton Soleil carré ton Mars aujourd'hui, ménage ta patience le soir — ne déverse pas ta tension sur lui.</p>
+    <p><b>Semaine :</b> Vénus carré ton Pluton (fin de semaine) peut réveiller intensité ou jalousie — transformez-le en conversation vraie.</p>
+    <p><b>Mois :</b> 28 juin (Mars-Uranus) = risque d'étincelle, évitez les sujets explosifs ; 30 juin (Jupiter-Uranus) = belle complicité, faites quelque chose de neuf ensemble.</p>
+    <p><b>Année :</b> l'opposition de Saturne vous demande de rééquilibrer les charges et de redire le « pourquoi » de l'engagement ; la fenêtre Jupiter oct-nov sur ta Vénus est idéale pour raviver tendresse et désir.</p>
+    <p><b>Pour la suite :</b> 2027-2028 (Pluton/Uranus harmonisent tes structures de maison 4) consolide durablement votre socle commun — un cap qui ancre le couple.</p></div></details>
+
+  <h3 style="color:var(--indigo);margin-top:20px">🌱 Nathan <span class="small">(8 juin 2010, 7h19, Toulouse · Soleil Gémeaux, Asc Cancer, Lune Bélier)</span></h3>
+  <div class="block"><p>Une résonance mère-fils rare : <b>vous partagez le même Ascendant Cancer</b> — même sensibilité, même besoin de nid.</p></div>
+  <details class="asp" open><summary>Vos liens de fond (synastrie)</summary><div class="body"><ul>
+    <li><span class="harm">Ton Neptune trigone sa Lune</span> (0,08°) : tu le « sens » avant les mots — tendresse, intuition, compassion.</li>
+    <li><b>Ta Lune & ton Pluton en opposition à sa Lune</b> : lien émotionnel puissant, parfois en tension (protection/attraction intenses).</li>
+    <li><span class="harm">Ton Uranus trigone son Jupiter & son Uranus</span> : tu encourages sa liberté et son originalité.</li>
+    <li><span class="tens">Ton Uranus carré son Mars</span> : il est vif et indépendant ; laisse-le initier pour éviter le bras de fer.</li>
+  </ul></div></details>
+  <details class="asp"><summary>Ce que ça donne — jour · semaine · mois · année · suite</summary><div class="body">
+    <p><b>Jour :</b> ta sensibilité est à fleur de peau (Lune en Capricorne, exigeante) — avec lui, privilégie la tendresse simple plutôt que le cadre.</p>
+    <p><b>Semaine :</b> bons moments de complicité en début de semaine (climat mental fluide) ; en fin de semaine, ne projette pas ton intensité émotionnelle sur lui.</p>
+    <p><b>Mois :</b> son anniversaire (8 juin) tombe en plein climat Gémeaux — parfait pour le dialogue, les jeux, les sorties légères.</p>
+    <p><b>Année :</b> son Soleil Gémeaux fait écho à ton Ascendant d'année (Gémeaux) : 2026 favorise vraiment le dialogue et la complicité — c'est l'année pour vous parler davantage.</p>
+    <p><b>Pour la suite :</b> il grandit vers plus d'autonomie (sa Lune Bélier) ; ton défi doux sera de lâcher du lest tout en gardant la base sûre que ton Ascendant Cancer sait offrir.</p></div></details>
+</section>
+
+<!-- ===================== NAÏKARYSMA ===================== -->
+<section class="panel" id="naikarysma">
+  <p class="eyebrow">Mon projet</p>
+  <h2>Naïkarysma — lancement & développement</h2>
+  <p class="lead">Ton thème est <b>fait</b> pour ce projet : maison 9 (transmettre), maison 8 (accompagner la transformation intime — ruminations, dépendance affective, relations toxiques, renaissance), Nœud Nord maison 2 (en faire une activité viable et juste). Ta quête de liberté (temps, lieu, argent) est inscrite dans ton ciel.</p>
+
+  <details class="asp" open><summary>🚀 Quand lancer le tunnel Ruminations ? (ma reco datée)</summary><div class="body">
+    <p>Tu veux idéalement juin, sinon juillet. Voici ce que dit le ciel :</p>
+    <div class="daterow"><span class="d">15 juin</span><span>Nouvelle Lune (maison 12, trigone Pluton) : parfaite pour <b>préparer en coulisses</b> et ouvrir une liste d'attente / pré-inscriptions. Sème maintenant.</span></div>
+    <div class="daterow"><span class="d">30 juin</span><span><span class="harm">Jupiter trigone ton Uranus</span> : <b>excellent jour pour un lancement « early »</b> si tu veux démarrer en juin — énergie d'innovation et de chance. <b>Évite le 28 juin</b> (Mars-Uranus, explosif).</span></div>
+    <div class="daterow"><span class="d">14 juil.</span><span>Nouvelle Lune sur ton Ascendant (carré Pluton) : puissante pour un <b>relancement personnel/image</b>, mais émotionnellement intense.</span></div>
+    <div class="daterow"><span class="d">12 août</span><span><span class="harm">Nouvelle Lune sur ton Nœud Nord (maison 2)</span> : <b>la meilleure date pour ouvrir les ventes</b> d'une offre alignée avec ta valeur.</span></div>
+    <div class="daterow"><span class="d">~17 août</span><span><span class="harm">Jupiter conjoint ton Nœud Nord</span> : <b>le pic d'expansion et de visibilité de l'année</b> — le moment le plus fort pour te montrer et grandir.</span></div>
+    <p><b>Ma reco :</b> si tu peux en juin, fais un <b>pré-lancement / liste d'attente autour du 15 juin</b> et une <b>ouverture le 30 juin</b>. Mais garde ton <b>gros lancement + temps fort de ventes pour la mi-août (12 → 17)</b> : c'est astrologiquement ta fenêtre reine. Juillet fonctionne, août est le sommet.</p></div></details>
+
+  <details class="asp"><summary>📣 Sujets porteurs selon les périodes</summary><div class="body">
+    <p><b>Fin juin (pleine lune Capricorne, maison 6) :</b> parle du <b>quotidien</b> — « calmer le mental qui tourne, retrouver des routines apaisées, reprendre le contrôle ». Très résonant pour les ruminations.</p>
+    <p><b>Mi-août (lune sur ton Nœud, maison 2) :</b> parle de <b>valeur et de transformation de soi</b> — « ce que ça change de retrouver la paix mentale ».</p>
+    <p><b>Fin août (pleine lune sur ton Soleil, maison 9) :</b> parle de <b>vision et de sens</b> — ta signature « Nouvelle Ère », transformer sa vie.</p>
+    <p><b>Maison 8 (ton terrain) :</b> ose le profond — l'intime, ce qu'on n'ose pas dire, la libération. C'est là que tu es la plus juste et la plus magnétique.</p></div></details>
+
+  <details class="asp"><summary>💡 Comment l'amener (ton style gagnant)</summary><div class="body">
+    <p><b>En 2026 (année Cancer + Jupiter sur l'Ascendant) :</b> communique avec <b>chaleur et proximité</b> — raconte, rassure, crée un sentiment de « maison » et de sécurité. Parle à « la personne qui rumine la nuit » comme à quelqu'un qu'on prend sous son aile. Ton Mercure-Vénus natals en maison 8 te permet de toucher le point intime, vrai et profond.</p>
+    <p><b>En 2027 (année Lion) :</b> place à la <b>visibilité et au rayonnement</b> — montre ton visage, ta voix, ta singularité ; ose la lumière (vidéo, scène, prise de parole). C'est l'année pour devenir une figure que l'on suit.</p></div></details>
+
+  <details class="asp"><summary>📈 Est-ce que ça va marcher ? & comment faire mieux (ventes)</summary><div class="body">
+    <p><b>Oui, le ciel soutient clairement</b> : 2026 lance (Jupiter sur ton Nœud en août), et <b>2027 est ton année de rayonnement</b> (RS Ascendant Lion + Jupiter en Lion sur l'Ascendant, Soleil en maison 7 = clients/public, Lune en maison 2 = revenus). 2027-2028 fait grandir ta visibilité et tes revenus, pendant que Pluton/Uranus solidifient tes structures.</p>
+    <p><b>Pour mieux vendre :</b></p><ul>
+      <li><b>Fenêtres de promo :</b> 16 oct. et surtout <b>31 oct. (Jupiter sur ta Vénus)</b> + <b>25 nov. → 10 déc. (Nœud sur ta Vénus/Mercure)</b> = périodes idéales pour offres, lancements de panier, communication qui convertit.</li>
+      <li><b>Construis de l'evergreen</b> (tunnel automatisé) plutôt que d'enchaîner des lancements épuisants : ton thème (risque d'épuisement) et tes transits 2027-28 (structures durables) plaident pour un modèle qui tourne sans te vider.</li>
+      <li><b>Protège ton énergie</b> : ta réussite durable dépend de ton rythme. Un système simple et répétable > un grand coup ponctuel.</li>
+    </ul></div></details>
+  <p class="small">Dis-moi quand tu veux un rétroplanning jour par jour pour une date de lancement précise.</p>
+</section>
+
+<!-- ===================== MON PROFIL ===================== -->
+<section class="panel" id="profil">
+  <p class="eyebrow">Mieux me connaître</p>
+  <h2>Le décryptage de mon thème</h2>
+  <p class="hint">Chaque position, signe, maison et aspect — déplie pour lire ce que ça dit de toi.</p>
+
+  <details class="asp"><summary>☉ Soleil en Poissons, maison 9 — qui tu es au fond</summary><div class="body"><p>Ton identité profonde est sensible, intuitive, imaginative, tournée vers le sens et l'invisible. En maison 9, tu brilles quand tu cherches, transmets, élargis ton horizon (sens, spiritualité, voyage, enseignement). Tu es faite pour être un pont vers « plus grand que soi ».</p></div></details>
+  <details class="asp"><summary>☽ Lune en Balance, maison 4 — tes besoins émotionnels</summary><div class="body"><p>Tu as besoin d'harmonie, de paix et de beauté pour te sentir en sécurité, surtout dans le foyer (maison 4). Tu apaises les tensions, parfois au prix de tes propres besoins. Ton ancrage = un « chez-toi » équilibré et esthétique.</p></div></details>
+  <details class="asp"><summary>↑ Ascendant Cancer — ta façon d'aborder le monde</summary><div class="body"><p>Tu te présentes douce, protectrice, intuitive, attentive aux autres. Tu fonctionnes par ressenti et tu protèges ton monde intérieur derrière une carapace tendre. Le « clan » et le nid sont essentiels.</p></div></details>
+  <details class="asp"><summary>☿ + ♀ Mercure & Vénus en Verseau, maison 8 — ton esprit & ton cœur</summary><div class="body"><p>Pensée originale, indépendante, attirée par le caché, le psychisme, le tabou (maison 8). Tu aimes comprendre les profondeurs humaines — c'est ta signature professionnelle. En amour (Vénus), tu mêles besoin de liberté (Verseau) et désir d'intensité fusionnelle (maison 8). Mercure rétrograde : tu penses « vers l'intérieur », en spirale, originale.</p></div></details>
+  <details class="asp"><summary>♂ Mars en Poissons, maison 9 — comment tu agis</summary><div class="body"><p>Tu agis par inspiration et par vagues, pas en ligne droite. Ton énergie est sensible au sens : tu te bats pour des idéaux, pas pour le combat. Revers : tu te disperses ou te vides si tu te forces contre ton rythme.</p></div></details>
+  <details class="asp"><summary>♃♄♇ Jupiter–Saturne–Pluton en Balance, maison 4 — tes racines</summary><div class="body"><p>Un trio puissant en maison 4 : tes fondations familiales sont à la fois riches, exigeantes et profondes. Tu portes un héritage dense ; ton grand œuvre de vie est de transformer (Pluton) et de bâtir solidement (Saturne) un foyer juste et équilibré (Balance), avec une vraie capacité d'expansion (Jupiter).</p></div></details>
+  <details class="asp"><summary>♅ Uranus & ♆ Neptune en Sagittaire (maisons 5 & 6)</summary><div class="body"><p>Uranus maison 5 : créativité originale, besoin de liberté dans l'expression et l'amour. Neptune maison 6 : sensibilité (et porosité) dans le quotidien et la santé — d'où l'importance de te protéger du stress ambiant.</p></div></details>
+  <details class="asp"><summary>☊ Nœud Nord en Lion, maison 2 — ton chemin d'évolution</summary><div class="body"><p>Ta croissance d'âme : oser <b>ta</b> lumière, <b>ta</b> valeur, <b>ta</b> créativité, et l'incarner concrètement (maison 2 : argent, ressources, estime). Sortir de l'effacement pour rayonner et recevoir.</p></div></details>
+  <details class="asp"><summary>★ Aspects majeurs — la mécanique fine</summary><div class="body"><ul>
+    <li><b>Vénus trigone Pluton (exact)</b> : aimer en profondeur, magnétisme, capacité de régénération par le lien.</li>
+    <li><b>Soleil conjoint Mars</b> : volonté et identité soudées — tu agis « avec tout toi », passionnée.</li>
+    <li><b>Lune conjoint Pluton</b> : émotions intenses et transformatrices ; tu ressens fort, tu renais en traversant.</li>
+    <li><b>Jupiter conjoint Saturne</b> : tension féconde entre expansion et prudence — tu construis du durable.</li>
+    <li><b>Soleil carré Uranus</b> : besoin de liberté qui bouscule l'identité (très activé en ce moment par les transits).</li>
+  </ul></div></details>
+  <details class="asp"><summary>⚷ Astéroïdes & points — les nuances de ton profil</summary><div class="body"><ul>
+    <li><b>Chiron en Taureau, maison 11</b> : blessure-ressource autour de la valeur et de la sécurité ; tu guéris en t'autorisant l'abondance et ta place dans les groupes.</li>
+    <li><b>Lilith en Scorpion, maison 5</b> : puissance créatrice et désir bruts, indomptés — ta part la plus libre.</li>
+    <li><b>Cérès en Cancer, maison 12</b> : tu materne en profondeur, parfois en t'oubliant — apprends à recevoir le soin.</li>
+    <li><b>Junon en Scorpion, maison 5</b> : engagement passionné et loyal. <b>Vesta en Vierge, maison 3</b> : dévotion au message que tu transmets.</li>
+  </ul></div></details>
+</section>
+
+<!-- ===================== THÈME & CARTES ===================== -->
+<section class="panel" id="theme">
+  <p class="eyebrow">Cartes du ciel</p>
+  <h2>Mon thème natal</h2>
+  <p class="date">23 février 1981, 14h15, Aubagne · maisons Placidus · vérifié au degré près</p>
+  <div class="wheel"><svg viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="200" y="22" text-anchor="middle" font-size="15" fill="#3b3666">Laëtitia · 23/02/1981</text><g transform="translate(0,30)"><circle cx="200" cy="200" r="192" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="164" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="128" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="44" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="192" fill="#fffdf8"/><circle cx="200" cy="200" r="164" fill="#f6f0e3"/><circle cx="200" cy="200" r="128" fill="#fffdf8"/><line x1="240.9" y1="78.7" x2="261.4" y2="18.1" stroke="#cdbfa0" stroke-width="0.8"/><text x="211.3" y="27.4" text-anchor="middle" font-size="15" fill="#3b3666">♈</text><line x1="174.8" y1="74.5" x2="162.2" y2="11.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="121.0" y="45.5" text-anchor="middle" font-size="15" fill="#b15c5c">♉</text><line x1="115.4" y1="103.9" x2="73.2" y2="55.9" stroke="#cdbfa0" stroke-width="0.8"/><text x="51.8" y="106.4" text-anchor="middle" font-size="15" fill="#3b3666">♊</text><line x1="78.7" y1="159.1" x2="18.1" y2="138.6" stroke="#cdbfa0" stroke-width="0.8"/><text x="22.4" y="193.7" text-anchor="middle" font-size="15" fill="#b15c5c">♋</text><line x1="74.5" y1="225.2" x2="11.8" y2="237.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="40.5" y="284.0" text-anchor="middle" font-size="15" fill="#3b3666">♌</text><line x1="103.9" y1="284.6" x2="55.9" y2="326.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="101.4" y="353.2" text-anchor="middle" font-size="15" fill="#b15c5c">♍</text><line x1="159.1" y1="321.3" x2="138.6" y2="381.9" stroke="#cdbfa0" stroke-width="0.8"/><text x="188.7" y="382.6" text-anchor="middle" font-size="15" fill="#3b3666">♎</text><line x1="225.2" y1="325.5" x2="237.8" y2="388.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="279.0" y="364.5" text-anchor="middle" font-size="15" fill="#b15c5c">♏</text><line x1="284.6" y1="296.1" x2="326.8" y2="344.1" stroke="#cdbfa0" stroke-width="0.8"/><text x="348.2" y="303.6" text-anchor="middle" font-size="15" fill="#3b3666">♐</text><line x1="321.3" y1="240.9" x2="381.9" y2="261.4" stroke="#cdbfa0" stroke-width="0.8"/><text x="377.6" y="216.3" text-anchor="middle" font-size="15" fill="#b15c5c">♑</text><line x1="325.5" y1="174.8" x2="388.2" y2="162.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="359.5" y="126.0" text-anchor="middle" font-size="15" fill="#3b3666">♒</text><line x1="296.1" y1="115.4" x2="344.1" y2="73.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="298.6" y="56.8" text-anchor="middle" font-size="15" fill="#b15c5c">♓</text><line x1="156.0" y1="200.0" x2="72.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="85.1" y="219.1" text-anchor="middle" font-size="9" fill="#9a8f78">1</text><line x1="158.3" y1="214.2" x2="78.8" y2="241.2" stroke="#b8aa86" stroke-width="0.6"/><text x="96.4" y="255.3" text-anchor="middle" font-size="9" fill="#9a8f78">2</text><line x1="166.6" y1="228.7" x2="102.9" y2="283.4" stroke="#b8aa86" stroke-width="0.6"/><text x="123.4" y="290.1" text-anchor="middle" font-size="9" fill="#9a8f78">3</text><line x1="184.1" y1="241.0" x2="153.7" y2="319.3" stroke="#b8aa86" stroke-width="1.4"/><text x="173.5" y="315.9" text-anchor="middle" font-size="9" fill="#9a8f78">4</text><line x1="211.7" y1="242.4" x2="234.0" y2="323.4" stroke="#b8aa86" stroke-width="0.6"/><text x="246.1" y="309.5" text-anchor="middle" font-size="9" fill="#9a8f78">5</text><line x1="236.3" y1="224.8" x2="305.7" y2="272.2" stroke="#b8aa86" stroke-width="0.6"/><text x="304.0" y="254.5" text-anchor="middle" font-size="9" fill="#9a8f78">6</text><line x1="244.0" y1="200.0" x2="328.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="314.9" y="186.9" text-anchor="middle" font-size="9" fill="#9a8f78">7</text><line x1="241.7" y1="185.8" x2="321.2" y2="158.8" stroke="#b8aa86" stroke-width="0.6"/><text x="303.6" y="150.7" text-anchor="middle" font-size="9" fill="#9a8f78">8</text><line x1="233.4" y1="171.3" x2="297.1" y2="116.6" stroke="#b8aa86" stroke-width="0.6"/><text x="276.6" y="115.9" text-anchor="middle" font-size="9" fill="#9a8f78">9</text><line x1="215.9" y1="159.0" x2="246.3" y2="80.7" stroke="#b8aa86" stroke-width="1.4"/><text x="226.5" y="90.1" text-anchor="middle" font-size="9" fill="#9a8f78">10</text><line x1="188.3" y1="157.6" x2="166.0" y2="76.6" stroke="#b8aa86" stroke-width="0.6"/><text x="153.9" y="96.5" text-anchor="middle" font-size="9" fill="#9a8f78">11</text><line x1="163.7" y1="175.2" x2="94.3" y2="127.8" stroke="#b8aa86" stroke-width="0.6"/><text x="96.0" y="151.5" text-anchor="middle" font-size="9" fill="#9a8f78">12</text><text x="-2.0" y="204.0" font-size="11" fill="#3b3666">AC</text><text x="270.2" y="19.1" text-anchor="middle" font-size="11" fill="#3b3666">MC</text><line x1="288.6" y1="107.6" x2="284.7" y2="296.0" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="217.9" y1="326.7" x2="306.3" y2="128.7" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="217.9" y1="326.7" x2="304.2" y2="125.7" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="217.9" y1="326.7" x2="316.9" y2="252.2" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="217.9" y1="326.7" x2="212.2" y2="327.4" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="306.3" y1="128.7" x2="304.2" y2="125.7" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="306.3" y1="128.7" x2="316.9" y2="252.2" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="306.3" y1="128.7" x2="212.2" y2="327.4" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="304.2" y1="125.7" x2="316.9" y2="252.2" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="304.2" y1="125.7" x2="212.2" y2="327.4" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="178.6" y1="326.2" x2="177.8" y2="326.1" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="178.6" y1="326.2" x2="81.3" y2="247.9" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="177.8" y1="326.1" x2="81.3" y2="247.9" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="316.9" y1="252.2" x2="212.2" y2="327.4" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><text x="301.1" y="99.6" text-anchor="middle" font-size="14" fill="#2b2740">☉</text><line x1="288.6" y1="107.6" x2="292.8" y2="103.3" stroke="#2b2740" stroke-width="0.8"/><text x="220.4" y="349.6" text-anchor="middle" font-size="14" fill="#2b2740">☽</text><line x1="217.9" y1="326.7" x2="218.7" y2="332.7" stroke="#2b2740" stroke-width="0.8"/><text x="321.3" y="123.7" text-anchor="middle" font-size="14" fill="#2b2740">☿</text><line x1="306.3" y1="128.7" x2="311.3" y2="125.4" stroke="#2b2740" stroke-width="0.8"/><text x="307.5" y="128.4" text-anchor="middle" font-size="14" fill="#2b2740">♀</text><line x1="304.2" y1="125.7" x2="309.1" y2="122.2" stroke="#2b2740" stroke-width="0.8"/><text x="284.9" y="86.2" text-anchor="middle" font-size="14" fill="#2b2740">♂</text><line x1="274.4" y1="95.9" x2="277.9" y2="91.0" stroke="#2b2740" stroke-width="0.8"/><text x="175.6" y="348.9" text-anchor="middle" font-size="14" fill="#2b2740">♃</text><line x1="178.6" y1="326.2" x2="177.6" y2="332.1" stroke="#2b2740" stroke-width="0.8"/><text x="177.2" y="335.0" text-anchor="middle" font-size="14" fill="#2b2740">♄</text><line x1="177.8" y1="326.1" x2="176.8" y2="332.0" stroke="#2b2740" stroke-width="0.8"/><text x="296.6" y="314.5" text-anchor="middle" font-size="14" fill="#2b2740">♅</text><line x1="284.7" y1="296.0" x2="288.6" y2="300.5" stroke="#2b2740" stroke-width="0.8"/><text x="333.3" y="264.6" text-anchor="middle" font-size="14" fill="#2b2740">♆</text><line x1="316.9" y1="252.2" x2="322.3" y2="254.7" stroke="#2b2740" stroke-width="0.8"/><text x="212.6" y="336.4" text-anchor="middle" font-size="14" fill="#2b2740">♇</text><line x1="212.2" y1="327.4" x2="212.8" y2="333.4" stroke="#2b2740" stroke-width="0.8"/><text x="64.6" y="259.7" text-anchor="middle" font-size="14" fill="#2b2740">☊</text><line x1="81.3" y1="247.9" x2="75.8" y2="250.2" stroke="#2b2740" stroke-width="0.8"/></g></svg></div>
+  <table>
+    <tr><th></th><th>Astre</th><th>Position</th><th>M.</th></tr>
+    <tr><td class="glyph">☉</td><td>Soleil</td><td>04°50' Poissons ♓</td><td>9</td></tr>
+    <tr><td class="glyph">☽</td><td>Lune</td><td>26°42' Balance ♎</td><td>4</td></tr>
+    <tr><td class="glyph">☿</td><td>Mercure</td><td>22°30' Verseau ♒ <span class="retro">R</span></td><td>8</td></tr>
+    <tr><td class="glyph">♀</td><td>Vénus</td><td>24°08' Verseau ♒</td><td>8</td></tr>
+    <tr><td class="glyph">♂</td><td>Mars</td><td>13°07' Poissons ♓</td><td>9</td></tr>
+    <tr><td class="glyph">♃</td><td>Jupiter</td><td>09°01' Balance ♎ <span class="retro">R</span></td><td>4</td></tr>
+    <tr><td class="glyph">♄</td><td>Saturne</td><td>08°41' Balance ♎ <span class="retro">R</span></td><td>4</td></tr>
+    <tr><td class="glyph">♅</td><td>Uranus</td><td>00°04' Sagittaire ♐</td><td>5</td></tr>
+    <tr><td class="glyph">♆</td><td>Neptune</td><td>24°35' Sagittaire ♐</td><td>6</td></tr>
+    <tr><td class="glyph">♇</td><td>Pluton</td><td>24°07' Balance ♎ <span class="retro">R</span></td><td>4</td></tr>
+    <tr><td class="glyph">☊</td><td>Nœud Nord</td><td>10°39' Lion ♌ <span class="retro">R</span></td><td>2</td></tr>
+  </table>
+  <p class="small">Astéroïdes : Chiron 13°55' Taureau (M11) · Cérès 13°39' Cancer (M12) · Pallas 5°32' Taureau (M11) · Junon 7°48' Scorpion (M5) · Vesta 2°48' Vierge (M3) · Lilith 11°08' Scorpion (M5) · Fortune 10°30' Poissons (M9) · Vertex 5°17' Sagittaire (M5). Asc 18°44' Cancer · MC 27°34' Poissons.</p>
+
+  <h2 style="margin-top:24px">Les cartes de Julien & Nathan</h2>
+  <p class="hint">Tu peux les consulter ici quand tu veux.</p>
+  <details class="asp"><summary>💞 Carte du ciel de Julien (11/12/1981, Nice)</summary><div class="body"><div class="wheel"><svg viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="200" y="22" text-anchor="middle" font-size="15" fill="#3b3666">Julien · 11/12/1981</text><g transform="translate(0,30)"><circle cx="200" cy="200" r="192" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="164" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="128" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="44" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="192" fill="#fffdf8"/><circle cx="200" cy="200" r="164" fill="#f6f0e3"/><circle cx="200" cy="200" r="128" fill="#fffdf8"/><line x1="327.4" y1="211.9" x2="391.2" y2="217.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="375.5" y="175.1" text-anchor="middle" font-size="15" fill="#3b3666">♈</text><line x1="316.3" y1="146.6" x2="374.5" y2="119.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="337.0" y="91.4" text-anchor="middle" font-size="15" fill="#b15c5c">♉</text><line x1="274.0" y1="95.6" x2="311.0" y2="43.3" stroke="#cdbfa0" stroke-width="0.8"/><text x="261.8" y="38.1" text-anchor="middle" font-size="15" fill="#3b3666">♊</text><line x1="211.9" y1="72.6" x2="217.8" y2="8.8" stroke="#cdbfa0" stroke-width="0.8"/><text x="170.1" y="29.5" text-anchor="middle" font-size="15" fill="#b15c5c">♋</text><line x1="146.6" y1="83.7" x2="119.8" y2="25.5" stroke="#cdbfa0" stroke-width="0.8"/><text x="86.4" y="68.0" text-anchor="middle" font-size="15" fill="#3b3666">♌</text><line x1="95.6" y1="126.0" x2="43.3" y2="89.0" stroke="#cdbfa0" stroke-width="0.8"/><text x="33.1" y="143.2" text-anchor="middle" font-size="15" fill="#b15c5c">♍</text><line x1="72.6" y1="188.1" x2="8.8" y2="182.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="24.5" y="234.9" text-anchor="middle" font-size="15" fill="#3b3666">♎</text><line x1="83.7" y1="253.4" x2="25.5" y2="280.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="63.0" y="318.6" text-anchor="middle" font-size="15" fill="#b15c5c">♏</text><line x1="126.0" y1="304.4" x2="89.0" y2="356.7" stroke="#cdbfa0" stroke-width="0.8"/><text x="138.2" y="371.9" text-anchor="middle" font-size="15" fill="#3b3666">♐</text><line x1="188.1" y1="327.4" x2="182.2" y2="391.2" stroke="#cdbfa0" stroke-width="0.8"/><text x="229.9" y="380.5" text-anchor="middle" font-size="15" fill="#b15c5c">♑</text><line x1="253.4" y1="316.3" x2="280.2" y2="374.5" stroke="#cdbfa0" stroke-width="0.8"/><text x="313.6" y="342.0" text-anchor="middle" font-size="15" fill="#3b3666">♒</text><line x1="304.4" y1="274.0" x2="356.7" y2="311.0" stroke="#cdbfa0" stroke-width="0.8"/><text x="366.9" y="266.8" text-anchor="middle" font-size="15" fill="#b15c5c">♓</text><line x1="156.0" y1="200.0" x2="72.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="85.1" y="219.1" text-anchor="middle" font-size="9" fill="#9a8f78">1</text><line x1="160.4" y1="219.3" x2="84.9" y2="256.0" stroke="#b8aa86" stroke-width="0.6"/><text x="103.8" y="267.8" text-anchor="middle" font-size="9" fill="#9a8f78">2</text><line x1="175.8" y1="236.8" x2="129.7" y2="307.0" stroke="#b8aa86" stroke-width="0.6"/><text x="150.4" y="307.9" text-anchor="middle" font-size="9" fill="#9a8f78">3</text><line x1="200.8" y1="244.0" x2="202.3" y2="328.0" stroke="#b8aa86" stroke-width="1.4"/><text x="218.2" y="317.6" text-anchor="middle" font-size="9" fill="#9a8f78">4</text><line x1="225.3" y1="236.0" x2="273.5" y2="304.8" stroke="#b8aa86" stroke-width="0.6"/><text x="279.2" y="287.8" text-anchor="middle" font-size="9" fill="#9a8f78">5</text><line x1="239.9" y1="218.6" x2="316.0" y2="254.1" stroke="#b8aa86" stroke-width="0.6"/><text x="310.9" y="236.9" text-anchor="middle" font-size="9" fill="#9a8f78">6</text><line x1="244.0" y1="200.0" x2="328.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="314.9" y="186.9" text-anchor="middle" font-size="9" fill="#9a8f78">7</text><line x1="239.6" y1="180.7" x2="315.1" y2="144.0" stroke="#b8aa86" stroke-width="0.6"/><text x="296.2" y="138.2" text-anchor="middle" font-size="9" fill="#9a8f78">8</text><line x1="224.2" y1="163.2" x2="270.3" y2="93.0" stroke="#b8aa86" stroke-width="0.6"/><text x="249.6" y="98.1" text-anchor="middle" font-size="9" fill="#9a8f78">9</text><line x1="199.2" y1="156.0" x2="197.7" y2="72.0" stroke="#b8aa86" stroke-width="1.4"/><text x="181.8" y="88.4" text-anchor="middle" font-size="9" fill="#9a8f78">10</text><line x1="174.7" y1="164.0" x2="126.5" y2="95.2" stroke="#b8aa86" stroke-width="0.6"/><text x="120.8" y="118.2" text-anchor="middle" font-size="9" fill="#9a8f78">11</text><line x1="160.1" y1="181.4" x2="84.0" y2="145.9" stroke="#b8aa86" stroke-width="0.6"/><text x="89.1" y="169.1" text-anchor="middle" font-size="9" fill="#9a8f78">12</text><text x="-2.0" y="204.0" font-size="11" fill="#3b3666">AC</text><text x="196.5" y="6.0" text-anchor="middle" font-size="11" fill="#3b3666">MC</text><line x1="163.8" y1="322.8" x2="246.3" y2="80.7" stroke="#b15c5c" stroke-width="0.8" opacity="0.7"/><line x1="163.8" y1="322.8" x2="164.3" y2="322.9" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="163.8" y1="322.8" x2="76.2" y2="232.5" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="163.8" y1="322.8" x2="175.7" y2="325.7" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="246.3" y1="80.7" x2="164.3" y2="322.9" stroke="#b15c5c" stroke-width="0.8" opacity="0.7"/><line x1="246.3" y1="80.7" x2="76.2" y2="232.5" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="164.3" y1="322.9" x2="76.2" y2="232.5" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="164.3" y1="322.9" x2="175.7" y2="325.7" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="256.3" y1="314.9" x2="73.2" y2="182.8" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="256.3" y1="314.9" x2="86.3" y2="258.7" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="256.3" y1="314.9" x2="128.8" y2="306.3" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="73.2" y1="182.8" x2="128.8" y2="306.3" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="73.2" y1="182.8" x2="175.7" y2="325.7" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="86.3" y1="258.7" x2="80.4" y2="245.7" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="76.2" y1="232.5" x2="80.4" y2="245.7" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="76.2" y1="232.5" x2="161.6" y2="77.9" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="175.7" y1="325.7" x2="80.4" y2="245.7" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="80.4" y1="245.7" x2="161.6" y2="77.9" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><text x="158.7" y="345.0" text-anchor="middle" font-size="14" fill="#2b2740">☉</text><line x1="163.8" y1="322.8" x2="162.1" y2="328.5" stroke="#2b2740" stroke-width="0.8"/><text x="252.8" y="68.9" text-anchor="middle" font-size="14" fill="#2b2740">☽</text><line x1="246.3" y1="80.7" x2="248.5" y2="75.1" stroke="#2b2740" stroke-width="0.8"/><text x="163.1" y="331.8" text-anchor="middle" font-size="14" fill="#2b2740">☿</text><line x1="164.3" y1="322.9" x2="162.6" y2="328.7" stroke="#2b2740" stroke-width="0.8"/><text x="264.3" y="336.1" text-anchor="middle" font-size="14" fill="#2b2740">♀</text><line x1="256.3" y1="314.9" x2="259.0" y2="320.3" stroke="#2b2740" stroke-width="0.8"/><text x="55.3" y="185.4" text-anchor="middle" font-size="14" fill="#2b2740">♂</text><line x1="73.2" y1="182.8" x2="67.2" y2="182.0" stroke="#2b2740" stroke-width="0.8"/><text x="70.3" y="272.0" text-anchor="middle" font-size="14" fill="#2b2740">♃</text><line x1="86.3" y1="258.7" x2="80.9" y2="261.5" stroke="#2b2740" stroke-width="0.8"/><text x="58.8" y="242.1" text-anchor="middle" font-size="14" fill="#2b2740">♄</text><line x1="76.2" y1="232.5" x2="70.4" y2="234.0" stroke="#2b2740" stroke-width="0.8"/><text x="118.7" y="326.3" text-anchor="middle" font-size="14" fill="#2b2740">♅</text><line x1="128.8" y1="306.3" x2="125.4" y2="311.3" stroke="#2b2740" stroke-width="0.8"/><text x="177.6" y="320.8" text-anchor="middle" font-size="14" fill="#2b2740">♆</text><line x1="175.7" y1="325.7" x2="174.5" y2="331.6" stroke="#2b2740" stroke-width="0.8"/><text x="63.6" y="257.1" text-anchor="middle" font-size="14" fill="#2b2740">♇</text><line x1="80.4" y1="245.7" x2="74.8" y2="247.8" stroke="#2b2740" stroke-width="0.8"/><text x="156.1" y="65.7" text-anchor="middle" font-size="14" fill="#2b2740">☊</text><line x1="161.6" y1="77.9" x2="159.7" y2="72.2" stroke="#2b2740" stroke-width="0.8"/></g></svg></div><p class="small">Soleil 18°53' Sagittaire (M3) · Lune 14°06' Gémeaux (M9) · Asc 5°19' Balance · Saturne 20°01' Balance & Pluton 26°13' Balance (M1) · Vénus 1°26' Verseau · Jupiter 2°37' Scorpion · Neptune 24°21' Sagittaire.</p></div></details>
+  <details class="asp"><summary>🌱 Carte du ciel de Nathan (08/06/2010, Toulouse)</summary><div class="body"><div class="wheel"><svg viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="200" y="22" text-anchor="middle" font-size="15" fill="#3b3666">Nathan · 08/06/2010</text><g transform="translate(0,30)"><circle cx="200" cy="200" r="192" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="164" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="128" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="44" fill="none" stroke="#cdbfa0" stroke-width="1"/><circle cx="200" cy="200" r="192" fill="#fffdf8"/><circle cx="200" cy="200" r="164" fill="#f6f0e3"/><circle cx="200" cy="200" r="128" fill="#fffdf8"/><line x1="204.2" y1="72.1" x2="206.3" y2="8.1" stroke="#cdbfa0" stroke-width="0.8"/><text x="159.6" y="31.6" text-anchor="middle" font-size="15" fill="#3b3666">♈</text><line x1="139.7" y1="87.1" x2="109.5" y2="30.7" stroke="#cdbfa0" stroke-width="0.8"/><text x="78.4" y="75.1" text-anchor="middle" font-size="15" fill="#b15c5c">♉</text><line x1="91.3" y1="132.4" x2="37.0" y2="98.6" stroke="#cdbfa0" stroke-width="0.8"/><text x="29.7" y="153.3" text-anchor="middle" font-size="15" fill="#3b3666">♊</text><line x1="72.1" y1="195.8" x2="8.1" y2="193.7" stroke="#cdbfa0" stroke-width="0.8"/><text x="26.6" y="245.4" text-anchor="middle" font-size="15" fill="#b15c5c">♋</text><line x1="87.1" y1="260.3" x2="30.7" y2="290.5" stroke="#cdbfa0" stroke-width="0.8"/><text x="70.1" y="326.6" text-anchor="middle" font-size="15" fill="#3b3666">♌</text><line x1="132.4" y1="308.7" x2="98.6" y2="363.0" stroke="#cdbfa0" stroke-width="0.8"/><text x="148.3" y="375.3" text-anchor="middle" font-size="15" fill="#b15c5c">♍</text><line x1="195.8" y1="327.9" x2="193.7" y2="391.9" stroke="#cdbfa0" stroke-width="0.8"/><text x="240.4" y="378.4" text-anchor="middle" font-size="15" fill="#3b3666">♎</text><line x1="260.3" y1="312.9" x2="290.5" y2="369.3" stroke="#cdbfa0" stroke-width="0.8"/><text x="321.6" y="334.9" text-anchor="middle" font-size="15" fill="#b15c5c">♏</text><line x1="308.7" y1="267.6" x2="363.0" y2="301.4" stroke="#cdbfa0" stroke-width="0.8"/><text x="370.3" y="256.7" text-anchor="middle" font-size="15" fill="#3b3666">♐</text><line x1="327.9" y1="204.2" x2="391.9" y2="206.3" stroke="#cdbfa0" stroke-width="0.8"/><text x="373.4" y="164.6" text-anchor="middle" font-size="15" fill="#b15c5c">♑</text><line x1="312.9" y1="139.7" x2="369.3" y2="109.5" stroke="#cdbfa0" stroke-width="0.8"/><text x="329.9" y="83.4" text-anchor="middle" font-size="15" fill="#3b3666">♒</text><line x1="267.6" y1="91.3" x2="301.4" y2="37.0" stroke="#cdbfa0" stroke-width="0.8"/><text x="251.7" y="34.7" text-anchor="middle" font-size="15" fill="#b15c5c">♓</text><line x1="156.0" y1="200.0" x2="72.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="85.1" y="219.1" text-anchor="middle" font-size="9" fill="#9a8f78">1</text><line x1="158.4" y1="214.4" x2="79.0" y2="241.7" stroke="#b8aa86" stroke-width="0.6"/><text x="96.7" y="255.7" text-anchor="middle" font-size="9" fill="#9a8f78">2</text><line x1="165.9" y1="227.8" x2="100.7" y2="280.8" stroke="#b8aa86" stroke-width="0.6"/><text x="121.1" y="288.0" text-anchor="middle" font-size="9" fill="#9a8f78">3</text><line x1="180.7" y1="239.6" x2="143.9" y2="315.1" stroke="#b8aa86" stroke-width="1.4"/><text x="164.2" y="313.3" text-anchor="middle" font-size="9" fill="#9a8f78">4</text><line x1="206.0" y1="243.6" x2="217.4" y2="326.8" stroke="#b8aa86" stroke-width="0.6"/><text x="231.6" y="314.6" text-anchor="middle" font-size="9" fill="#9a8f78">5</text><line x1="233.9" y1="228.0" x2="298.8" y2="281.4" stroke="#b8aa86" stroke-width="0.6"/><text x="298.9" y="263.6" text-anchor="middle" font-size="9" fill="#9a8f78">6</text><line x1="244.0" y1="200.0" x2="328.0" y2="200.0" stroke="#b8aa86" stroke-width="1.4"/><text x="314.9" y="186.9" text-anchor="middle" font-size="9" fill="#9a8f78">7</text><line x1="241.6" y1="185.6" x2="321.0" y2="158.3" stroke="#b8aa86" stroke-width="0.6"/><text x="303.3" y="150.3" text-anchor="middle" font-size="9" fill="#9a8f78">8</text><line x1="234.1" y1="172.2" x2="299.3" y2="119.2" stroke="#b8aa86" stroke-width="0.6"/><text x="278.9" y="118.0" text-anchor="middle" font-size="9" fill="#9a8f78">9</text><line x1="219.3" y1="160.4" x2="256.1" y2="84.9" stroke="#b8aa86" stroke-width="1.4"/><text x="235.8" y="92.7" text-anchor="middle" font-size="9" fill="#9a8f78">10</text><line x1="194.0" y1="156.4" x2="182.6" y2="73.2" stroke="#b8aa86" stroke-width="0.6"/><text x="168.4" y="91.4" text-anchor="middle" font-size="9" fill="#9a8f78">11</text><line x1="166.1" y1="172.0" x2="101.2" y2="118.6" stroke="#b8aa86" stroke-width="0.6"/><text x="101.1" y="142.4" text-anchor="middle" font-size="9" fill="#9a8f78">12</text><text x="-2.0" y="204.0" font-size="11" fill="#3b3666">AC</text><text x="285.0" y="25.6" text-anchor="middle" font-size="11" fill="#3b3666">MC</text><line x1="150.8" y1="81.8" x2="80.4" y2="245.7" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="95.4" y1="126.2" x2="80.4" y2="245.7" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="95.4" y1="126.2" x2="133.3" y2="309.3" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="95.4" y1="126.2" x2="203.6" y2="72.1" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="95.4" y1="126.2" x2="191.1" y2="327.7" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="95.4" y1="126.2" x2="203.6" y2="72.0" stroke="#7a6fb0" stroke-width="0.8" opacity="0.4"/><line x1="95.4" y1="126.2" x2="270.1" y2="92.9" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="133.3" y1="309.3" x2="270.1" y2="92.9" stroke="#b15c5c" stroke-width="0.8" opacity="0.7"/><line x1="133.3" y1="309.3" x2="327.9" y2="194.1" stroke="#3f7d6b" stroke-width="0.8" opacity="0.7"/><line x1="203.6" y1="72.1" x2="191.1" y2="327.7" stroke="#b15c5c" stroke-width="0.8" opacity="0.7"/><line x1="203.6" y1="72.1" x2="203.6" y2="72.0" stroke="#b8893b" stroke-width="0.8" opacity="0.7"/><line x1="203.6" y1="72.1" x2="327.9" y2="194.1" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><line x1="191.1" y1="327.7" x2="203.6" y2="72.0" stroke="#b15c5c" stroke-width="0.8" opacity="0.7"/><line x1="203.6" y1="72.0" x2="327.9" y2="194.1" stroke="#b15c5c" stroke-width="0.8" opacity="0.4"/><text x="58.7" y="168.3" text-anchor="middle" font-size="14" fill="#2b2740">☉</text><line x1="76.1" y1="167.8" x2="70.3" y2="166.3" stroke="#2b2740" stroke-width="0.8"/><text x="143.9" y="70.2" text-anchor="middle" font-size="14" fill="#2b2740">☽</text><line x1="150.8" y1="81.8" x2="148.5" y2="76.3" stroke="#2b2740" stroke-width="0.8"/><text x="80.7" y="120.9" text-anchor="middle" font-size="14" fill="#2b2740">☿</text><line x1="95.4" y1="126.2" x2="90.5" y2="122.8" stroke="#2b2740" stroke-width="0.8"/><text x="63.6" y="257.1" text-anchor="middle" font-size="14" fill="#2b2740">♀</text><line x1="80.4" y1="245.7" x2="74.8" y2="247.8" stroke="#2b2740" stroke-width="0.8"/><text x="124.0" y="329.6" text-anchor="middle" font-size="14" fill="#2b2740">♂</text><line x1="133.3" y1="309.3" x2="130.2" y2="314.4" stroke="#2b2740" stroke-width="0.8"/><text x="204.1" y="59.1" text-anchor="middle" font-size="14" fill="#2b2740">♃</text><line x1="203.6" y1="72.1" x2="203.8" y2="66.1" stroke="#2b2740" stroke-width="0.8"/><text x="189.8" y="350.6" text-anchor="middle" font-size="14" fill="#2b2740">♄</text><line x1="191.1" y1="327.7" x2="190.7" y2="333.7" stroke="#2b2740" stroke-width="0.8"/><text x="203.7" y="73.1" text-anchor="middle" font-size="14" fill="#2b2740">♅</text><line x1="203.6" y1="72.0" x2="203.7" y2="66.1" stroke="#2b2740" stroke-width="0.8"/><text x="279.9" y="82.8" text-anchor="middle" font-size="14" fill="#2b2740">♆</text><line x1="270.1" y1="92.9" x2="273.4" y2="87.9" stroke="#2b2740" stroke-width="0.8"/><text x="345.8" y="198.2" text-anchor="middle" font-size="14" fill="#2b2740">♇</text><line x1="327.9" y1="194.1" x2="333.9" y2="193.8" stroke="#2b2740" stroke-width="0.8"/><text x="343.6" y="178.9" text-anchor="middle" font-size="14" fill="#2b2740">☊</text><line x1="325.9" y1="177.1" x2="331.8" y2="176.0" stroke="#2b2740" stroke-width="0.8"/></g></svg></div><p class="small">Soleil 17°19' Gémeaux (M12) · Lune 24°29' Bélier (M11) · Asc 1°53' Cancer (comme maman) · Mercure 26°42' Taureau · Vénus 22°47' Cancer · Mars 0°30' Vierge · Pluton 4°33' Capricorne.</p></div></details>
+</section>
+
+<!-- ===================== PORTRAIT ===================== -->
+<section class="panel" id="portrait">
+  <p class="eyebrow">Mieux me connaître en profondeur</p>
+  <h2>Mon portrait astrologique</h2>
+  <p class="hint">Le portrait complet existe aussi en PDF (structure détaillée, 13 pages). Voici l'essentiel, déplie chaque partie.</p>
+
+  <div class="block"><h3>Tes répartitions</h3><div class="schemabox"><svg viewBox="0 0 300 330" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="150" y="20" text-anchor="middle" font-size="15" fill="#3b3666">Hémisphères</text><g transform="translate(0,28)"><circle cx="150" cy="150" r="120" fill="#f6f0e3" stroke="#cdbfa0"/><line x1="30" y1="150" x2="270" y2="150" stroke="#cdbfa0"/><line x1="150" y1="30" x2="150" y2="270" stroke="#cdbfa0"/><text x="150" y="24" text-anchor="middle" font-size="11" fill="#6f6985">Sud (public) 4</text><text x="150" y="286" text-anchor="middle" font-size="11" fill="#6f6985">Nord (intime) 7</text><text x="26" y="146" text-anchor="middle" font-size="11" fill="#6f6985" transform="rotate(-90 26 150)">Est (soi) 1</text><text x="274" y="146" text-anchor="middle" font-size="11" fill="#6f6985" transform="rotate(90 274 150)">Ouest (autres) 10</text><path d="M150,150 L150,270 A120,120 0 0,1 30,150 Z" fill="#b8893b" opacity="0.18"/><text x="105" y="205" font-size="12" fill="#b8893b">dominante</text></g></svg></div><p class="small"><b>Nord + Ouest dominants</b> : une vie centrée sur l'intime et sur les autres, qui se construit de l'intérieur et à travers les liens — plus que par l'ambition publique.</p></div>
+
+  <div class="block"><h3>Éléments & modes</h3><div class="schemabox"><svg viewBox="0 0 420 222" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="210.0" y="26" text-anchor="middle" font-size="15" fill="#3b3666">Éléments dominants</text><text x="14" y="67" font-size="13" fill="#2b2740">Feu</text><rect x="110" y="52" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="52" width="50.6" height="20" rx="5" fill="#c0623f"/><text x="394" y="67" text-anchor="end" font-size="12" fill="#6f6985">9%</text><text x="14" y="105" font-size="13" fill="#2b2740">Terre</text><rect x="110" y="90" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="90" width="0.0" height="20" rx="5" fill="#7d6b3a"/><text x="394" y="105" text-anchor="end" font-size="12" fill="#6f6985">0%</text><text x="14" y="143" font-size="13" fill="#2b2740">Air</text><rect x="110" y="128" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="128" width="270.0" height="20" rx="5" fill="#5a86a8"/><text x="394" y="143" text-anchor="end" font-size="12" fill="#6f6985">48%</text><text x="14" y="181" font-size="13" fill="#2b2740">Eau</text><rect x="110" y="166" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="166" width="241.9" height="20" rx="5" fill="#3f7d6b"/><text x="394" y="181" text-anchor="end" font-size="12" fill="#6f6985">43%</text></svg></div><div class="schemabox"><svg viewBox="0 0 420 184" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="210.0" y="26" text-anchor="middle" font-size="15" fill="#3b3666">Modes dominants</text><text x="14" y="67" font-size="13" fill="#2b2740">Cardinal</text><rect x="110" y="52" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="52" width="270.0" height="20" rx="5" fill="#b15c5c"/><text x="394" y="67" text-anchor="end" font-size="12" fill="#6f6985">43%</text><text x="14" y="105" font-size="13" fill="#2b2740">Fixe</text><rect x="110" y="90" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="90" width="106.7" height="20" rx="5" fill="#7d6b3a"/><text x="394" y="105" text-anchor="end" font-size="12" fill="#6f6985">17%</text><text x="14" y="143" font-size="13" fill="#2b2740">Mutable</text><rect x="110" y="128" width="270" height="20" rx="5" fill="#efe9dd"/><rect x="110" y="128" width="244.9" height="20" rx="5" fill="#5a86a8"/><text x="394" y="143" text-anchor="end" font-size="12" fill="#6f6985">39%</text></svg></div>
+  <p class="small"><b>Air 48 % + Eau 43 %, Terre 0 %</b> : tu vis dans les idées et les émotions ; ton défi est de <b>matérialiser</b> (concret, corps, rythme, modèle solide). <b>Cardinal + Mutable</b> : tu inities et t'adaptes très bien, la constance dans la durée est ton point d'effort → privilégie l'evergreen.</p></div>
+
+  <div class="block"><h3>Tes dominantes</h3><div class="schemabox"><svg viewBox="0 0 420 370" xmlns="http://www.w3.org/2000/svg" font-family="Georgia,serif"><text x="210.0" y="26" text-anchor="middle" font-size="15" fill="#3b3666">Dominantes planétaires</text><text x="14" y="62" font-size="12.5" fill="#2b2740">Vénus</text><rect x="110" y="48" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="48" width="270.0" height="16" rx="4" fill="#3b3666"/><text x="14" y="92" font-size="12.5" fill="#2b2740">Pluton</text><rect x="110" y="78" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="78" width="248.4" height="16" rx="4" fill="#3b3666"/><text x="14" y="122" font-size="12.5" fill="#2b2740">Lune</text><rect x="110" y="108" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="108" width="237.6" height="16" rx="4" fill="#3b3666"/><text x="14" y="152" font-size="12.5" fill="#2b2740">Saturne</text><rect x="110" y="138" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="138" width="216.0" height="16" rx="4" fill="#3b3666"/><text x="14" y="182" font-size="12.5" fill="#2b2740">Neptune</text><rect x="110" y="168" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="168" width="199.8" height="16" rx="4" fill="#3b3666"/><text x="14" y="212" font-size="12.5" fill="#2b2740">Jupiter</text><rect x="110" y="198" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="198" width="183.6" height="16" rx="4" fill="#3b3666"/><text x="14" y="242" font-size="12.5" fill="#2b2740">Mercure</text><rect x="110" y="228" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="228" width="162.0" height="16" rx="4" fill="#3b3666"/><text x="14" y="272" font-size="12.5" fill="#2b2740">Soleil</text><rect x="110" y="258" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="258" width="145.8" height="16" rx="4" fill="#3b3666"/><text x="14" y="302" font-size="12.5" fill="#2b2740">Mars</text><rect x="110" y="288" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="288" width="129.6" height="16" rx="4" fill="#3b3666"/><text x="14" y="332" font-size="12.5" fill="#2b2740">Uranus</text><rect x="110" y="318" width="270" height="16" rx="4" fill="#efe9dd"/><rect x="110" y="318" width="108.0" height="16" rx="4" fill="#3b3666"/></svg></div>
+  <p class="small"><b>Vénus & Pluton</b> (trigone exact) : aimer en profondeur, transformer par le lien. <b>Lune</b> : sensibilité au premier plan. Signes : Balance, Poissons, Verseau. Maisons : 4 (foyer), 8 (intime/transformation), 9 (sens).</p></div>
+
+  <details class="asp"><summary>Style & comportement — Soleil Poissons, Ascendant Cancer</summary><div class="body"><p>Au fond : une sensible-intuitive en quête de sens et de beauté. Aux yeux des autres : douce, protectrice, enveloppante (Cancer). Le maître de ton Ascendant (Lune en Balance M4) renforce ton besoin d'harmonie dans le foyer.</p></div></details>
+  <details class="asp"><summary>Sensibilité — Lune Balance, maison 4</summary><div class="body"><p>Tu cherches l'harmonie et apaises les tensions ; tu t'oublies parfois pour préserver la paix. Ta sensibilité est la plus vive dans ton foyer et tes racines — ton chez-toi est ton baromètre.</p></div></details>
+  <details class="asp"><summary>Affectivité — Vénus Verseau, maison 8</summary><div class="body"><p>Tu aimes librement (Verseau) mais en profondeur et jusqu'à la fusion (maison 8 + trigone Pluton). Mélange rare de besoin de liberté et de désir d'absolu. La complicité d'esprit compte autant que la tendresse.</p></div></details>
+  <details class="asp"><summary>Façon d'agir — Mars Poissons, maison 9</summary><div class="body"><p>Tu agis par inspiration et par vagues, pour des causes qui ont du sens. Ta force est immense portée par un idéal, et s'évapore si tu te forces contre ton ressenti. Tu agis le mieux dans les grands projets porteurs de sens.</p></div></details>
+  <details class="asp"><summary>Intellect — Mercure Verseau ℞, maison 8</summary><div class="body"><p>Esprit original, indépendant, synthétique, qui voit les structures cachées. Tu formules mieux par écrit. Tu aimes penser l'intime, le psychisme, les sujets profonds — le cœur même de Naïkarysma.</p></div></details>
+  <details class="asp"><summary>Buts & destin — Soleil maison 9, Nœud Lion maison 2</summary><div class="body"><p>Te réaliser par le sens et la transmission (M9), et grandir en osant ta lumière et ta valeur (Nœud Lion M2). Ton destin : passer de « celle qui aide dans l'ombre » à « celle qui rayonne et transmet en assumant sa valeur ».</p></div></details>
+  <details class="asp"><summary>Atouts (Jupiter M4) & gravité (Saturne M4)</summary><div class="body"><p><b>Atouts :</b> ta chance vient de tes relations et de l'harmonie que tu crées ; talent de conseil et de médiation. <b>Gravité :</b> le poids et les peurs se logent dans les racines/le foyer ; ta solidité se construit en bâtissant un nid vraiment tien (chantier 2027-2028).</p></div></details>
+  <details class="asp"><summary>Étude karmique — Nœuds, Lilith, Chiron</summary><div class="body"><p>Nœud Sud Verseau M8 (acquis : profondeur, détachement, vivre via l'intensité des autres) → Nœud Nord Lion M2 (chemin : oser être toi, créer, reconnaître ta valeur, quitter la dépendance affective pour la souveraineté joyeuse). Lilith Scorpion M5 : puissance créatrice à assumer. Chiron Taureau M11 : blessure-ressource sur la valeur/sécurité, qui te rend aidante sur ces sujets.</p></div></details>
+  <p class="small">📄 Le portrait complet (avec tous les chapitres) est dans ton dossier en PDF : « Portrait_astrologique_Laetitia ».</p>
+</section>
+
+<!-- ===================== MON MODE D'EMPLOI ===================== -->
+<section class="panel" id="modeemploi">
+  <p class="eyebrow">Mon mode d'emploi</p>
+  <h2>Comment je fonctionne — et ce qui marche pour moi</h2>
+  <p class="hint">Ta notice personnelle, lue par ton thème : pour t'en servir toi-même, et pour que ton entourage (et tes projets) donnent le meilleur.</p>
+
+  <details class="asp" open><summary>⚙️ Comment je fonctionne vraiment</summary><div class="body"><ul>
+    <li><b>Par le ressenti d'abord</b> (Eau dominante, Ascendant Cancer) : tu captes l'ambiance avant les mots. Ton intuition est un instrument de précision.</li>
+    <li><b>Par vagues, pas en ligne droite</b> (Mars Poissons) : ton énergie monte par élans inspirés et redescend ; tu n'es pas faite pour le régime constant.</li>
+    <li><b>En pensant « autrement »</b> (Mercure Verseau ℞) : tu réfléchis en spirale, par associations larges et éclairs ; tu formules mieux par écrit et après avoir « infusé ».</li>
+    <li><b>En cherchant l'harmonie</b> (Lune Balance) : tu as besoin de paix relationnelle et de beauté pour fonctionner.</li>
+    <li><b>En ayant besoin de sens</b> (Soleil Poissons M9) : sans signification, tu te vides ; avec du sens, tu es inépuisable.</li>
+  </ul></div></details>
+
+  <details class="asp" open><summary>✅ Ce qui marche POUR toi</summary><div class="body"><p>Un <b>rythme doux mais régulier</b>, des projets <b>porteurs de sens</b>, de la <b>liberté</b> (de temps, de lieu), créer et écrire <b>librement</b>, la <b>profondeur</b> plutôt que la quantité, un <b>cocon</b> où te déposer, des <b>relations vraies</b>. Tu avances par inspiration : protège tes fenêtres d'énergie et agis quand l'élan est là.</p>
+  <p><b>Ce qui te casse :</b> les cadres rigides, le sur-régime, la superficialité, le conflit frontal, et tout ce qui n'a pas de sens. Quand tu forces contre ton ressenti, tu t'épuises.</p></div></details>
+
+  <details class="asp"><summary>🤝 Ce qui fonctionne AVEC toi (pour ton entourage)</summary><div class="body"><p>On obtient le meilleur de toi par la <b>douceur, le respect de ton rythme, la profondeur et l'authenticité</b>, et en <b>reconnaissant ta valeur</b>. Tu te fermes face à l'autorité brutale, la pression, l'urgence permanente ou le jugement. Tu donnes énormément quand tu te sens en sécurité et estimée.</p></div></details>
+
+  <details class="asp"><summary>🚀 Ce qui fait marcher tes réalisations (Naïkarysma)</summary><div class="body"><ul>
+    <li><b>Partir de l'intuition + du sens</b>, pas d'un plan froid : c'est là que naissent tes meilleures idées.</li>
+    <li><b>Compenser ton manque de Terre et de Fixe</b> : appuie-toi sur des <b>systèmes qui tournent</b> (evergreen, automatisation) et, si possible, délègue le concret/administratif. Ta réussite durable ne doit pas reposer sur ta seule énergie.</li>
+    <li><b>Créer dans les fenêtres d'inspiration</b> et capitaliser (réutiliser tes contenus) plutôt que de tout refaire.</li>
+    <li><b>Protéger ton énergie</b> comme l'actif n°1 de ton entreprise.</li>
+    <li><b>Oser ta valeur et tes prix</b> (Nœud maison 2) : c'est la clé qui débloque l'abondance pour toi.</li>
+  </ul></div></details>
+</section>
+
+<!-- ===================== DESTINÉE & HÉRITAGE ===================== -->
+<section class="panel" id="destinee">
+  <p class="eyebrow">Le sens profond</p>
+  <h2>Ce que je viens vivre, accomplir & laisser</h2>
+  <p class="hint">Le grand récit de ton thème : ta raison d'être, et comment les aspects en cours, de l'année et à venir y participent.</p>
+
+  <div class="card key"><h3>Ce que tu es venue vivre</h3><p>Une <b>libération</b> (Uranus) et une <b>transformation</b> (Pluton, maisons 4 & 8) : passer de l'effacement et de la dépendance affective à la <b>souveraineté joyeuse</b> (Nœud Nord Lion, maison 2). Apprendre à recevoir autant que tu donnes, à oser ta lumière, et à <b>incarner</b> tes dons dans le concret (ton manque de Terre est précisément ton terrain d'apprentissage).</p></div>
+
+  <div class="block"><h3>Ce que tu vas accomplir</h3><p>Une œuvre d'<b>accompagnement et de transmission</b> (Soleil + Mars maison 9, Mercure-Vénus maison 8) : aider des personnes à apaiser leur tempête intérieure — ruminations, dépendance affective, schémas — et à se choisir. Bâtir Naïkarysma comme un véhicule de cette mission, et fonder un <b>foyer choisi</b>, reconstruit sur du vrai (maison 4).</p></div>
+
+  <div class="block"><h3>Ce que tu vas laisser sur cette terre</h3><p>Des <b>êtres transformés</b> : des gens plus libres, plus en paix, plus eux-mêmes parce qu'ils t'ont croisée. Une <b>méthode et des mots</b> qui continueront de circuler (ton approche intégrative). Et une lignée familiale <b>apaisée</b> : ce que tu transformes dans tes racines (maison 4), tu le transmets allégé à Nathan et aux suivants.</p></div>
+
+  <div class="block"><h3>Comment les aspects y participent — et comment les prendre en compte</h3><p><b>Maintenant (2026) :</b> Jupiter sur ton Nœud (août) ouvre la porte de la visibilité — <i>ose lancer et te montrer</i>. <b>2027-2028 :</b> Pluton/Uranus reconstruisent tes fondations — <i>bâtis du durable, un modèle qui te libère</i>. <b>~2040 :</b> ton 2<sup>e</sup> retour de Saturne te fait passeuse/guide — <i>tout converge vers la transmission</i>.</p>
+  <p><b>Transformer ça concrètement, sans pression :</b> avance par petits pas alignés (un contenu, une offre, une limite posée), dans le respect de ton rythme. Tu n'as rien à prouver ni à forcer : ta mission se déploie quand tu pars de l'authentique. Le sens n'est pas une performance, c'est une direction.</p></div>
+
+  <div class="card key" style="text-align:center"><h3>✦ Ton épitaphe (telle qu'elle s'écrit déjà)</h3>
+  <p style="font-size:15px"><em>« Elle a aidé tant d'âmes à apaiser leur tempête intérieure et à se choisir — et elle a, enfin, appris à se choisir elle aussi. Elle a transformé l'héritage reçu en lumière transmise. »</em></p>
+  <p class="small">Ce qu'on aurait aimé qu'elle fasse <b>un peu plus</b> (non comme un reproche, mais comme une invitation douce) : <b>oser plus tôt prendre sa place et recevoir</b>, et <b>se ménager davantage</b>. Ce sont précisément tes deux grands apprentissages (Nœud maison 2, Terre manquante) : les développer ne sert pas qu'à toi — c'est ce qui te permettra d'aider plus longtemps, plus largement, sans t'épuiser. Pas de pression : juste te rappeler que <b>te choisir fait partie de ta mission</b>.</p></div>
+</section>
+
+<!-- ===================== AFFINITÉS ===================== -->
+<section class="panel" id="affinites">
+  <p class="eyebrow">Tes affinités d'âme</p>
+  <h2>Penseurs & figures qui te ressemblent</h2>
+  <p class="hint">Des personnes avec qui tu partages des idées, une sensibilité, une mission — et la signature astrologique qui l'explique. (Affinités de signe/signature ; une synastrie fine demanderait leur heure de naissance.)</p>
+
+  <details class="asp" open><summary>Carl Gustav Jung — l'exploration de la psyché</summary><div class="body"><p>Le père de la psychologie des profondeurs : inconscient, symboles, transformation intérieure, individuation. C'est <b>ton terrain</b> (Mercure-Vénus maison 8, Pluton, Neptune). Son Soleil en <b>Lion</b> résonne avec ton <b>Nœud Nord en Lion</b> : la même invitation à devenir pleinement soi et à rayonner.</p></div></details>
+  <details class="asp" open><summary>Anaïs Nin — l'écriture de l'intime</summary><div class="body"><p>Née le 21 février, <b>Soleil Poissons à deux degrés du tien</b> : presque ta jumelle solaire. Son œuvre — explorer et écrire la vie intérieure, le désir, l'émotion sans fard — épouse ta Vénus-Mercure et ta maison 8. Une affinité profonde avec ta vocation de mettre des mots sur l'intime.</p></div></details>
+  <details class="asp"><summary>Simone Weil — la mystique de l'attention</summary><div class="body"><p>Philosophe de la <b>compassion, de l'attention et du sacré dans le réel</b>. Son Soleil <b>Verseau</b> rejoint ton Mercure-Vénus Verseau ; sa spiritualité incarnée rejoint ton Soleil Poissons. Comme toi, une pensée qui sert et qui élève.</p></div></details>
+  <details class="asp"><summary>Spinoza — la philosophie des affects</summary><div class="body"><p>Penseur de l'<b>unité du vivant</b> et de la libération par la compréhension de nos émotions (les « affects »). Son Soleil <b>Sagittaire</b> fait écho à ton Uranus-Neptune Sagittaire (maisons 5-6). Sa joie comme puissance d'agir parle directement à ta quête de sérénité.</p></div></details>
+  <details class="asp"><summary>Thich Nhat Hanh — la pleine conscience douce</summary><div class="body"><p>Maître de la <b>paix intérieure et de la présence</b>. Son Soleil <b>Balance</b> rejoint ton amas Balance (Lune, Jupiter, Saturne, Pluton) ; sa douceur et son sens de l'harmonie sont profondément les tiens. Une inspiration pour ta façon d'accompagner.</p></div></details>
+  <details class="asp"><summary>Brené Brown — la vulnérabilité comme force</summary><div class="body"><p>Chercheuse de la <b>vulnérabilité, de la honte et du courage d'être soi</b> — exactement les territoires de Naïkarysma (dépendance affective, estime). Son Soleil <b>Scorpion</b> résonne avec ta maison 8 et ta Lilith Scorpion : oser regarder et dire ce qu'on cache.</p></div></details>
+  <p class="small">Tu veux que je calcule une vraie synastrie avec l'une de ces figures (si on trouve son heure de naissance) ? Dis-le-moi.</p>
+</section>
+
+<!-- ===================== QUESTIONS (IA) ===================== -->
+<section class="panel" id="questions">
+  <p class="eyebrow">Poser une question</p>
+  <h2>Mes questions à l'astro</h2>
+  <p class="hint">Pose ta question : l'IA répond en s'appuyant sur ton thème natal complet. (Réponses en direct dans l'application Cowork.)</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
+    <input id="qinput" type="text" placeholder="Ex. : Quel est le meilleur moment ce mois-ci pour avancer sur Naïkarysma ?" style="flex:1;min-width:240px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:var(--panel);color:var(--ink)">
+    <button id="qask" style="padding:11px 18px;border:none;border-radius:10px;background:var(--indigo);color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Demander</button>
+  </div>
+  <div style="margin:8px 0">
+    <span class="small">Idées :</span>
+    <span class="qchip">Que me dit le ciel cette semaine ?</span>
+    <span class="qchip">Comment préserver mon énergie en ce moment ?</span>
+    <span class="qchip">Quand lancer mon programme ?</span>
+    <span class="qchip">Comment mieux communiquer avec Nathan ?</span>
+  </div>
+  <div id="qanswer" class="block" style="display:none;white-space:pre-wrap"></div>
+  <p class="small">Pour des analyses approfondies (rétroplanning, synastrie détaillée, etc.), demande-le directement dans la conversation.</p>
+</section>
+
+<p class="foot">Calculs : Swiss Ephemeris · Thème, synastries, lunaisons & cartes vérifiés au degré près · Rapports régénérés automatiquement.</p>
+</div>
+<style>
+.qchip{display:inline-block;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:4px 10px;margin:3px 4px;font-size:12.5px;color:var(--accent);cursor:pointer}
+.qchip:hover{border-color:var(--gold)}
+.scorebar{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13.5px}
+.scorebar .lbl{min-width:150px}
+.scorebar .track{flex:1;height:9px;background:var(--soft);border-radius:6px;overflow:hidden}
+.scorebar .fill{height:100%;border-radius:6px}
+.scorebar .val{min-width:34px;text-align:right;color:var(--muted)}
+</style>
+<script>
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){
+      var id=t.getAttribute('data-t');
+      document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(x=>x.classList.remove('show'));
+      t.classList.add('active'); document.getElementById(id).classList.add('show');
+      try{localStorage.setItem('astro_tab',id);}catch(e){}
+      window.scrollTo({top:0,behavior:'smooth'});
+    });
+  });
+  try{var s=localStorage.getItem('astro_tab');
+    if(s&&document.getElementById(s)){document.querySelector('.tab[data-t="'+s+'"]').click();}
+  }catch(e){}
+
+  /* --- Scores du moment --- */
+  var SCORES=[
+    ["✶ Vocation & projet",8.5,"#3f7d6b"],
+    ["◈ Argent & valeur",7,"#b8893b"],
+    ["❤ Couple",6.5,"#b8893b"],
+    ["💞 Vie relationnelle",6.5,"#b8893b"],
+    ["✲ Création",8,"#3f7d6b"],
+    ["✈ Liberté",7.5,"#b8893b"],
+    ["🏡 Foyer & racines",8.5,"#3f7d6b"],
+    ["🌊 État émotionnel",6.5,"#b8893b"],
+    ["🩺 Santé & énergie",6,"#b15c5c"]
+  ];
+  (function(){
+    var box=document.getElementById('scores'); if(!box) return;
+    var glob=(SCORES.reduce(function(a,b){return a+b[1]},0)/SCORES.length).toFixed(1);
+    var html='<div class="scorebar"><div class="lbl"><b>Global</b></div><div class="track"><div class="fill" style="width:'+(glob*10)+'%;background:#3b3666"></div></div><div class="val"><b>'+glob+'</b></div></div>';
+    SCORES.forEach(function(s){
+      html+='<div class="scorebar"><div class="lbl">'+s[0]+'</div><div class="track"><div class="fill" style="width:'+(s[1]*10)+'%;background:'+s[2]+'"></div></div><div class="val">'+s[1].toFixed(1)+'</div></div>';
+    });
+    box.innerHTML=html;
+  })();
+
+  /* --- Questions à l'IA --- */
+  var NATAL_CTX="Tu es l'astrologue personnel et bienveillant de Laëtitia. Réponds en français, avec chaleur, concret et précision, en t'appuyant sur SON thème. "
+   +"Données natales (23/02/1981, 14h15, Aubagne) : Soleil 4°50 Poissons M9, Lune 26°42 Balance M4, Ascendant Cancer 18°44, MC Poissons, Mercure 22°30 Verseau M8 R, Vénus 24°08 Verseau M8, Mars 13°07 Poissons M9, Jupiter 9°01 Balance M4, Saturne 8°41 Balance M4, Uranus 0°04 Sagittaire M5, Neptune 24°35 Sagittaire M6, Pluton 24°07 Balance M4, Nœud Nord 10°39 Lion M2, Lilith 11°08 Scorpion M5, Chiron 13°55 Taureau M11. "
+   +"Aspects clés : Vénus trigone Pluton, Jupiter conjoint Saturne, Lune conjointe Pluton, Soleil carré Uranus. "
+   +"Contexte actuel (juin 2026) : double pivot de mi-vie (opposition Uranus + opposition Saturne) ; année Cancer (RS 2026 à Istanbul, Jupiter sur l'Ascendant) ; 2027 année Lion (rayonnement). Projet Naïkarysma (accompagnement en ligne : ruminations, dépendance affective, relations toxiques, programme Nouvelle Ère). Mari Julien (11/12/1981 Nice), fils Nathan (08/06/2010 Toulouse). Elle vise la liberté de temps, de lieu et financière, et a connu l'épuisement. "
+   +"Garde une réponse de 4 à 8 phrases, actionnable.";
+  function setAns(t){var a=document.getElementById('qanswer');a.style.display='block';a.textContent=t;}
+  async function askAstro(q){
+    if(!q) return;
+    setAns("Consultation du ciel…");
+    try{
+      if(!window.cowork||!window.cowork.askClaude){
+        setAns("La réponse en direct fonctionne dans l'application Cowork (pas dans cet aperçu). Tu peux aussi me poser la question directement dans la conversation, j'y répondrai avec ton thème complet.");
+        return;
+      }
+      var r=await window.cowork.askClaude(NATAL_CTX+"\n\nQuestion de Laëtitia : "+q, []);
+      setAns(typeof r==="string"?r:(r&&r.text?r.text:JSON.stringify(r)));
+    }catch(e){ setAns("Je n'ai pas pu interroger le ciel en direct ici. Pose-moi la question dans la conversation et j'y répondrai avec ton thème. ("+e+")"); }
+  }
+  var qa=document.getElementById('qask'), qi=document.getElementById('qinput');
+  if(qa){ qa.addEventListener('click',function(){askAstro(qi.value.trim());}); }
+  if(qi){ qi.addEventListener('keydown',function(e){if(e.key==='Enter')askAstro(qi.value.trim());}); }
+  document.querySelectorAll('.qchip').forEach(function(c){
+    c.addEventListener('click',function(){ if(qi){qi.value=c.textContent;} askAstro(c.textContent); });
+  });
+
+  /* --- Audio du jour (synthèse vocale de l'appareil) --- */
+  (function(){
+    var play=document.getElementById('playmsg'), stop=document.getElementById('stopmsg'),
+        msg=document.getElementById('dailymsg'), sel=document.getElementById('voicesel'), hint=document.getElementById('voicehint');
+    if(!play||!('speechSynthesis' in window)){ if(play){play.disabled=true;play.title="Synthèse vocale non disponible sur cet appareil";} if(sel){sel.style.display="none";} return; }
+    var voices=[];
+    // score : on privilégie les voix FR féminines de meilleure qualité (premium/neural/Google)
+    function score(v){
+      var n=(v.name||"").toLowerCase(), s=0;
+      if(/premium|enhanced|neural|natural|siri/.test(n)) s+=6;
+      if(/google/.test(n)) s+=5;
+      if(/audrey|aurélie|aurelie|amélie|amelie|marie|léa|lea|virginie|chloé|chloe|julie|denise|céline|celine/.test(n)) s+=4;
+      if(/female|femme/.test(n)) s+=2;
+      if(/^fr-FR/i.test(v.lang)) s+=2; else if(/^fr/i.test(v.lang)) s+=1;
+      if(/thomas|paul|nicolas|male|homme|daniel/.test(n)) s-=4;
+      return s;
+    }
+    function loadVoices(){
+      var all=speechSynthesis.getVoices()||[];
+      voices=all.filter(function(v){return /^fr/i.test(v.lang);});
+      if(!voices.length){ voices=all; }
+      voices.sort(function(a,b){return score(b)-score(a);});
+      if(!sel) return;
+      sel.innerHTML="";
+      voices.forEach(function(v,i){ var o=document.createElement('option'); o.value=i; o.textContent=v.name+" ("+v.lang+")"; sel.appendChild(o); });
+      var saved=null; try{saved=localStorage.getItem('astro_voice');}catch(e){}
+      var idx=0; if(saved){ var f=voices.findIndex(function(v){return v.name===saved;}); if(f>=0) idx=f; }
+      sel.value=idx;
+      if(hint){ hint.textContent = voices.length? "" : "Aucune voix française détectée ici."; }
+    }
+    loadVoices();
+    if(typeof speechSynthesis.onvoiceschanged!=="undefined"){ speechSynthesis.onvoiceschanged=loadVoices; }
+    if(sel){ sel.addEventListener('change',function(){ try{localStorage.setItem('astro_voice',voices[sel.value].name);}catch(e){} speechSynthesis.cancel(); speak(); }); }
+    function speak(){
+      speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(msg.textContent.trim());
+      u.lang="fr-FR"; u.rate=0.94; u.pitch=1.05;
+      var v=voices[sel?sel.value:0]; if(v){u.voice=v; u.lang=v.lang;}
+      u.onstart=function(){stop.style.display="inline-block";play.textContent="❚❚ Pause";};
+      u.onend=function(){stop.style.display="none";play.textContent="▶ Écouter";};
+      speechSynthesis.speak(u);
+    }
+    play.addEventListener('click',function(){
+      if(speechSynthesis.speaking && !speechSynthesis.paused){ speechSynthesis.pause(); play.textContent="▶ Reprendre"; return; }
+      if(speechSynthesis.paused){ speechSynthesis.resume(); play.textContent="❚❚ Pause"; return; }
+      speak();
+    });
+    stop.addEventListener('click',function(){ speechSynthesis.cancel(); stop.style.display="none"; play.textContent="▶ Écouter"; });
+  })();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+</body>
+</html>
