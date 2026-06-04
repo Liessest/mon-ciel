@@ -615,7 +615,7 @@ ul{margin:.4em 0;padding-left:1.2em} li{margin:.3em 0}
 <section class="panel" id="questions">
   <p class="eyebrow">Poser une question</p>
   <h2>Mes questions à l'astro</h2>
-  <p class="hint">Pose ta question : l'IA répond en s'appuyant sur ton thème natal complet. (Réponses en direct dans l'application Cowork.)</p>
+  <p class="hint">Touche une question ci-dessous : la réponse s'affiche aussitôt, à partir de ton thème. Pour une question libre ou une analyse approfondie, pose-la dans Cowork.</p>
   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0">
     <input id="qinput" type="text" placeholder="Ex. : Quel est le meilleur moment ce mois-ci pour avancer sur Naïkarysma ?" style="flex:1;min-width:240px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;background:var(--panel);color:var(--ink)">
     <button id="qask" style="padding:11px 18px;border:none;border-radius:10px;background:var(--indigo);color:#fff;font-family:inherit;font-size:14px;cursor:pointer">Demander</button>
@@ -686,12 +686,28 @@ ul{margin:.4em 0;padding-left:1.2em} li{margin:.3em 0}
    +"Contexte actuel (juin 2026) : double pivot de mi-vie (opposition Uranus + opposition Saturne) ; année Cancer (RS 2026 à Istanbul, Jupiter sur l'Ascendant) ; 2027 année Lion (rayonnement). Projet Naïkarysma (accompagnement en ligne : ruminations, dépendance affective, relations toxiques, programme Nouvelle Ère). Mari Julien (11/12/1981 Nice), fils Nathan (08/06/2010 Toulouse). Elle vise la liberté de temps, de lieu et financière, et a connu l'épuisement. "
    +"Garde une réponse de 4 à 8 phrases, actionnable.";
   function setAns(t){var a=document.getElementById('qanswer');a.style.display='block';a.textContent=t;}
+  /* Réponses prêtes (hors-ligne) aux questions fréquentes, tirées de ton thème */
+  var QA_LOCAL={
+   semaine:"Cette semaine (lun. 1er → dim. 7 juin) se vit en deux temps. Le début est fluide pour l'esprit et la parole (Mercure en harmonie avec ton Soleil) : planifie tes contenus, tes échanges et tes prises de parole tôt dans la semaine. Vers dimanche, Mercure vient interroger tes Saturne–Jupiter en maison 4 : une décision familiale ou domestique peut peser — mets-la par écrit et ne tranche rien dans le découragement. En fin de semaine, Vénus carré ton Pluton intensifie les émotions et les liens : exprime ce que tu ressens plutôt que de le garder, et ne t'engage pas financièrement sur un coup de cœur. Une éclaircie Vénus–Uranus peut t'offrir une belle surprise : laisse de la place à l'imprévu. Fil rouge : clarifier et assumer, ressentir en profondeur, puis t'alléger.",
+   energie:"Ton thème te le répète : tu n'es pas faite pour le régime constant. Avec Neptune en maison 6 et Mars en Poissons, ton énergie est cyclique et perméable au stress — tu absorbes l'ambiance et tu te vides vite si tu te forces. La clé n'est pas d'en faire plus, mais d'instaurer un rythme doux et régulier : protège ton sommeil, garde des temps seule, alterne effort et vraie récupération. En ce moment, l'année Cancer t'invite justement à reconstruire un nid protecteur et à ralentir — ce n'est pas du repli, c'est ton socle. Les jours où Mars est sollicité, mets l'énergie dans ton corps (marche, respiration, eau) plutôt que dans les tensions. Et rappelle-toi : te ménager n'est pas un frein, c'est le moteur de ta réussite durable.",
+   lancer:"Le ciel te trace une fenêtre claire. Autour du 15 juin (nouvelle lune en maison 12, en harmonie avec ton Pluton), prépare en coulisses : ouvre une liste d'attente, sème. Le 30 juin (Jupiter en harmonie avec ton Uranus) est un excellent jour pour une ouverture « early » si tu veux démarrer en juin — évite en revanche le 28 juin (Mars–Uranus, explosif). Mais ta vraie fenêtre reine, c'est la mi-août : le 12 août (nouvelle lune sur ton Nœud Nord en maison 2) pour ouvrir les ventes, et autour du 17 août (Jupiter sur ton Nœud) pour le pic de visibilité de l'année. Ma reco : pré-lancement mi-juin, ouverture possible le 30 juin, et gros lancement + temps fort de ventes à la mi-août. Juillet fonctionne, août est le sommet.",
+   nathan:"Vous partagez le même Ascendant Cancer : même sensibilité, même besoin de nid — tu le « sens » avant les mots (ton Neptune en harmonie avec sa Lune). Avec lui, la tendresse simple passe mieux que le cadre ou les exigences, surtout les jours où ta Lune traverse un signe plus dur. Sa Lune en Bélier le pousse vers l'autonomie : laisse-le initier, propose plutôt qu'impose, pour éviter le bras de fer (ton Uranus carré son Mars). Son Soleil Gémeaux adore le dialogue, le jeu, la légèreté : les sorties et les conversations ouvertes sont vos meilleurs terrains — et 2026 favorise vraiment ça. Ton défi doux : lâcher un peu de lest tout en gardant la base sûre que ton Ascendant Cancer sait offrir."
+  };
+  function qnorm(s){return (s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
+  function localAnswer(q){
+    var n=qnorm(q);
+    if(/semaine|ciel cette/.test(n)) return QA_LOCAL.semaine;
+    if(/energie|fatigue|epuis|repos|menager|recuper/.test(n)) return QA_LOCAL.energie;
+    if(/lancer|programme|naikarysma|offre|tunnel|vente|lancement/.test(n)) return QA_LOCAL.lancer;
+    if(/nathan|mon fils|mon enfant/.test(n)) return QA_LOCAL.nathan;
+    return "Bonne question ✨ Les réponses toutes prêtes ici portent sur : ta semaine, ton énergie, le lancement de ton programme, et Nathan. Pour celle-ci — et pour toute analyse approfondie (rétroplanning, synastrie détaillée…) — pose-la-moi dans Cowork : j'y réponds avec ton thème complet.";
+  }
   async function askAstro(q){
     if(!q) return;
     setAns("Consultation du ciel…");
     try{
       if(!window.cowork||!window.cowork.askClaude){
-        setAns("La réponse en direct fonctionne dans l'application Cowork (pas dans cet aperçu). Tu peux aussi me poser la question directement dans la conversation, j'y répondrai avec ton thème complet.");
+        setAns(localAnswer(q));
         return;
       }
       var r=await window.cowork.askClaude(NATAL_CTX+"\n\nQuestion de Laëtitia : "+q, []);
